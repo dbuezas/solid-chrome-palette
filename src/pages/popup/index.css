@@ -7,13 +7,4 @@ body {
   -moz-osx-font-smoothing: grayscale;
   position: relative;
   width: 605px;
-  /* height: 395px; */
-  /* background: rgba(0, 0, 0, 0.75); */
-  padding: 10px;
-  overflow: auto;
-}
-
-.list {
-  height: 300px;
-  overflow: auto;
 }

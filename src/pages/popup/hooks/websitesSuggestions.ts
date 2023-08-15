@@ -4,33 +4,39 @@ import { matchCommand, parsedInput, setInput } from "../signals";
 type Template = {
   name: string;
   url: (query: string) => string;
+  icon: string;
   keyword: string;
 };
 const templates: Template[] = [
   {
     name: "Google Drive",
     url: (query) => `https://drive.google.com/drive/search?q=${query}`,
+    icon: "https://drive.google.com",
     keyword: "gd",
   },
   {
     name: "Youtube",
     url: (query) => `https://www.youtube.com/results?search_query=${query}`,
+    icon: "https://www.youtube.com",
     keyword: "y",
   },
   {
     name: "Google",
     url: (query) => `https://www.google.com/search?q=${query}`,
+    icon: "https://www.google.com",
     keyword: "g",
   },
   {
     name: "Wikipedia",
     url: (query) => `https://en.wikipedia.org/w/index.php?search=${query}`,
+    icon: "https://en.wikipedia.org",
     keyword: "w",
   },
 ];
 
 const base = templates.map((template) => ({
   name: `Search ${template.name}`,
+  icon: template.icon,
   category: "Search",
   command: async function () {
     setInput(template.keyword + ">");

@@ -8,14 +8,14 @@ import niceUrl from "./niceUrl";
 export function isDefined<T>(a: T | null): a is T {
   return Boolean(a);
 }
-
 const commands = createLazyResource([], async () => {
-  const list = await browser.history.search({
+  let list = [];
+  const history = await browser.history.search({
     text: "",
     startTime: 0,
-    maxResults: 1000,
+    maxResults: 10000,
   }); // fetch all
-  return list
+  list = history
     .map(({ url, title, lastVisitTime }) => {
       if (!url) return null;
       return {
@@ -23,19 +23,21 @@ const commands = createLazyResource([], async () => {
         category: "History",
         // keyword: url.slice(0, 100),
         timeAgo: formatDistanceToNow(lastVisitTime || 0),
-        icon: "chrome://favicon/" + url,
+        icon: url,
         command: async function () {
           await browser.tabs.create({ url });
         },
       };
     })
     .filter(isDefined);
+  return list;
 });
 
 const base = [
   {
     name: "Search History",
     category: "Search",
+    icon: "chrome://history/",
     command: async function () {
       setInput(KEYWORD + ">");
     },

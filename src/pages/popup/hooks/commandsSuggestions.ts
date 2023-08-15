@@ -2,19 +2,18 @@
 
 import browser from "webextension-polyfill";
 import { resetHistory } from "../last-used";
-import { inputSignal, matchCommand } from "../signals";
+import { inputSignal, parsedInput } from "../signals";
 
 export type Command = {
   name: string;
-  icon?: string;
   category?: string;
   shortcut?: string;
   timeAgo?: string;
   keyword?: string;
   command: Function;
-  onHighlighted?: Function;
+  icon?: string;
 };
-const [inputValue, setInputValue] = inputSignal;
+const [, setInputValue] = inputSignal;
 
 const base: Command[] = [
   {
@@ -387,8 +386,8 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 function useCommandSuggestions() {
-  const { isOtherKeyword } = matchCommand();
-  if (isOtherKeyword) return [];
+  const { isCommand } = parsedInput();
+  if (isCommand) return [];
   return base;
 }
 

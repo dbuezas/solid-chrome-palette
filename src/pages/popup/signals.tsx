@@ -1,4 +1,4 @@
-import { createMemo, createSignal } from "solid-js";
+import { Setter, createMemo, createSignal } from "solid-js";
 
 export const inputSignal = createSignal("");
 
@@ -24,14 +24,14 @@ export const matchCommand = (keyword: string) => {
 
 export const createLazyResource = <T,>(
   initialValue: T,
-  fetcher: () => Promise<T>
+  fetcher: (setVal: Setter<T>) => Promise<T>
 ) => {
   const [val, setVal] = createSignal(initialValue);
   const [fetched, setFetched] = createSignal(false);
   return () => {
     if (!fetched()) {
-      fetcher().then(setVal);
       setFetched(true);
+      fetcher(setVal).then(setVal);
     }
     return val();
   };

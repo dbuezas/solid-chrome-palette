@@ -42,12 +42,19 @@ const manifest = defineManifest(async () => ({
     "bookmarks",
     // "processes",
     "history",
-    // "chrome://favicon/",
+    "favicon",
   ],
+
   web_accessible_resources: [
     {
-      resources: ["assets/js/*.js", "assets/css/*.css", "assets/img/*"],
+      resources: [
+        "_favicon/*",
+        "assets/js/*.js",
+        "assets/css/*.css",
+        "assets/img/*",
+      ],
       matches: ["*://*/*"],
+      extension_ids: ["*"],
     },
   ],
 }));

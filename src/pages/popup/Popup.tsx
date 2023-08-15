@@ -1,18 +1,19 @@
 // render inside top level Solid component
 
 import fuzzysort from "fuzzysort";
-import { For, createEffect, createMemo, createSignal } from "solid-js";
+import { For, Show, createEffect, createMemo, createSignal } from "solid-js";
 import tinykeys from "tinykeys"; // Or `window.tinykeys` using the CDN version
 import browser from "webextension-polyfill";
+import styles from "./Popup.module.css";
 import { audibleTabSuggestions } from "./hooks/audioSuggestions";
 import { bookmarkSuggestions } from "./hooks/bookmarkSuggestions";
 import { bookmarkThisSuggestions } from "./hooks/bookmarkThisSuggestions";
-import commandSuggestions from "./hooks/commandsSuggestions";
+import commandSuggestions, { Command } from "./hooks/commandsSuggestions";
 import { historySuggestions } from "./hooks/historySuggestions";
 import { switchTabSuggestions } from "./hooks/tabsSuggestions";
 import { websitesSuggestions } from "./hooks/websitesSuggestions";
 import { sortByUsed, storeLastUsed } from "./last-used";
-import { inputSignal, parsedInput } from "./signals";
+import { createLazyResource, inputSignal, parsedInput } from "./signals";
 
 const [selectedI_internal, setSelectedI] = createSignal(0);
 
@@ -21,11 +22,17 @@ const selectedI = () => {
   return ((selectedI_internal() % n) + n) % n;
 };
 
-const [shortcut, setShortcut] = createSignal("unset");
+const shortcut = createLazyResource("unset", async () => {
+  const commands = await browser?.commands?.getAll();
+  const mainCommand = commands.find(({ name }) => name === "_execute_action");
+  if (mainCommand?.shortcut) return mainCommand.shortcut;
+  return "unset";
+});
+
 const [inputValue, setInputValue] = inputSignal;
 
 const allCommands = createMemo(() => {
-  let commands = [
+  let commands: Command[] = [
     ...commandSuggestions(),
     ...audibleTabSuggestions(),
     ...switchTabSuggestions(),
@@ -68,48 +75,83 @@ tinykeys(window, {
     // window.close();
   },
 });
-
-browser?.commands?.getAll().then(async (commands) => {
-  const mainCommand = commands.find(({ name }) => name === "_execute_action");
-  if (mainCommand?.shortcut) setShortcut(mainCommand.shortcut);
-});
-
+function faviconURL(u: string) {
+  const url = new URL(chrome.runtime.getURL("/_favicon/"));
+  url.searchParams.set("pageUrl", u);
+  url.searchParams.set("size", "32");
+  return url.toString();
+}
+const sep = String.fromCharCode(0);
 const App = () => {
   return (
-    <div class="my-app">
+    <div class={styles.App}>
       <p>{shortcut()}</p>
       <input
+        class={styles.input}
         autofocus
+        placeholder="Type to search"
         value={inputValue()}
+        onBlur={(e) => {
+          e.target.focus();
+        }}
         onInput={(e) => {
           setInputValue(e.target.value);
           setSelectedI(0);
         }}
       />
-      <div class="list">
+      <ul class={styles.list}>
         <For each={filteredCommands()}>
           {(match, i) => {
             let el;
+            const isSelected = () => i() === selectedI();
             createEffect(() => {
-              if (i() === selectedI())
+              if (isSelected())
                 el.scrollIntoView({ behavior: "auto", block: "nearest" });
             });
+            const text = !parsedInput().query
+              ? match.obj.name
+              : fuzzysort.highlight(match, sep, sep);
+
+            const idx = text.indexOf("\n");
+            const item = idx === -1 ? text : text.slice(0, idx);
+            const subitem = idx === -1 ? "" : text.slice(idx + 1);
+
             return (
-              <p
-                onclick={() => match.obj.command()}
-                ref={el}
-                style={{
-                  background: i() === selectedI() ? "lightgrey" : undefined,
-                }}
-              >
-                {!parsedInput().query
-                  ? match.obj.name
-                  : fuzzysort.highlight(match, (m, i) => <b>{m}</b>)}
-              </p>
+              <>
+                <li
+                  classList={{
+                    [styles.selected]: isSelected(),
+                  }}
+                  onMouseEnter={() => setSelectedI(i())}
+                  onclick={() => match.obj.command()}
+                  ref={el}
+                >
+                  <Show when={match.obj.icon}>
+                    <img
+                      classList={{
+                        [styles.img]: true,
+                        [styles.img_big]: !!subitem,
+                      }}
+                      src={faviconURL(match.obj.icon)}
+                      alt=""
+                    />
+                  </Show>
+
+                  <div>
+                    {item.split(sep).map((t, i) => (i % 2 ? <b>{t}</b> : t))}
+                    <br />
+                    <span class={styles.subitem}>
+                      {subitem
+                        .split(sep)
+                        .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
+                    </span>
+                  </div>
+                </li>
+              </>
             );
           }}
         </For>
-      </div>
+      </ul>
     </div>
   );
 };

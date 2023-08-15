@@ -10,7 +10,7 @@ const commands = createLazyResource([], async () => {
     url ||= "";
     return {
       name: `${title}\n${niceUrl(url)}`,
-      icon: "chrome://favicon/" + url,
+      icon: url,
       category: "Tab",
       command: () => {
         browser.tabs.update(id, { highlighted: true });
