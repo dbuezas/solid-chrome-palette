@@ -85,31 +85,34 @@ const sep = String.fromCharCode(0);
 const App = () => {
   return (
     <div class={styles.App}>
-      <p>{shortcut()}</p>
-      <input
-        class={styles.input}
-        autofocus
-        placeholder="Type to search"
-        value={inputValue()}
-        onBlur={(e) => {
-          e.target.focus();
-        }}
-        onInput={(e) => {
-          setInputValue(e.target.value);
-          setSelectedI(0);
-        }}
-      />
+      <div class={styles.input_wrap}>
+        <input
+          class={styles.input}
+          autofocus
+          placeholder="Type to search"
+          value={inputValue()}
+          onBlur={(e) => {
+            e.target.focus();
+          }}
+          onInput={(e) => {
+            setInputValue(e.target.value);
+            setSelectedI(0);
+          }}
+        />
+        <kbd>{shortcut()}</kbd>
+      </div>
       <ul class={styles.list}>
         <For each={filteredCommands()}>
           {(match, i) => {
             let el;
+            let { obj } = match;
             const isSelected = () => i() === selectedI();
             createEffect(() => {
               if (isSelected())
                 el.scrollIntoView({ behavior: "auto", block: "nearest" });
             });
             const text = !parsedInput().query
-              ? match.obj.name
+              ? obj.name
               : fuzzysort.highlight(match, sep, sep);
 
             const idx = text.indexOf("\n");
@@ -117,37 +120,37 @@ const App = () => {
             const subitem = idx === -1 ? "" : text.slice(idx + 1);
 
             return (
-              <>
-                <li
-                  classList={{
-                    [styles.selected]: isSelected(),
-                  }}
-                  onMouseEnter={() => setSelectedI(i())}
-                  onclick={() => match.obj.command()}
-                  ref={el}
-                >
-                  <Show when={match.obj.icon}>
-                    <img
-                      classList={{
-                        [styles.img]: true,
-                        [styles.img_big]: !!subitem,
-                      }}
-                      src={faviconURL(match.obj.icon)}
-                      alt=""
-                    />
-                  </Show>
+              <li
+                classList={{
+                  [styles.selected]: isSelected(),
+                  [styles.li]: true,
+                }}
+                onMouseMove={() => setSelectedI(i())}
+                onclick={() => obj.command()}
+                ref={el}
+              >
+                <Show when={obj.icon}>
+                  <img
+                    classList={{
+                      [styles.img]: true,
+                      [styles.img_big]: !!subitem,
+                    }}
+                    src={faviconURL(obj.icon)}
+                    alt=""
+                  />
+                </Show>
 
-                  <div>
-                    {item.split(sep).map((t, i) => (i % 2 ? <b>{t}</b> : t))}
-                    <br />
-                    <span class={styles.subitem}>
-                      {subitem
-                        .split(sep)
-                        .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
-                    </span>
-                  </div>
-                </li>
-              </>
+                <div>
+                  {item.split(sep).map((t, i) => (i % 2 ? <b>{t}</b> : t))}
+                  <br />
+                  <span class={styles.subitem}>
+                    {subitem.split(sep).map((t, i) => (i % 2 ? <b>{t}</b> : t))}
+                  </span>
+                </div>
+                <Show when={obj.shortcut}>
+                  <kbd>{obj.shortcut}</kbd>
+                </Show>
+              </li>
             );
           }}
         </For>
