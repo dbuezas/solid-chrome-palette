@@ -30,7 +30,7 @@ const shortcut = createLazyResource("unset", async () => {
 });
 
 const [inputValue, setInputValue] = inputSignal;
-
+let last;
 const allCommands = createMemo(() => {
   let commands: Command[] = [
     ...commandSuggestions(),
@@ -45,8 +45,8 @@ const allCommands = createMemo(() => {
   return commands;
 });
 
-const filteredCommands = createMemo(() => {
-  const results = fuzzysort.go(parsedInput().query, allCommands(), {
+const matches = createMemo(() => {
+  return fuzzysort.go(parsedInput().query, allCommands(), {
     threshold: -Infinity, // Don't return matches worse than this (higher is faster)
     limit: 100, // Don't return more results than this (lower is faster)
     all: true, // If true, returns all results for an empty search
@@ -54,7 +54,9 @@ const filteredCommands = createMemo(() => {
     // keys: null, // For when targets are objects (see its example usage)
     // scoreFn: null, // For use with `keys` (see its example usage)
   });
-  return results;
+});
+const filteredCommands = createMemo(() => {
+  return matches().map((match) => match.obj);
 });
 
 tinykeys(window, {
@@ -68,11 +70,10 @@ tinykeys(window, {
   },
   Enter: (e) => {
     e.preventDefault();
-    const selected = filteredCommands().at(selectedI()).obj;
+    const selected = filteredCommands()[selectedI()];
     selected.command();
     storeLastUsed(selected);
     setSelectedI(0);
-    // window.close();
   },
 });
 function faviconURL(u: string) {
@@ -82,6 +83,7 @@ function faviconURL(u: string) {
   return url.toString();
 }
 const sep = String.fromCharCode(0);
+
 const App = () => {
   return (
     <div class={styles.App}>
@@ -89,7 +91,7 @@ const App = () => {
         <input
           class={styles.input}
           autofocus
-          placeholder="Type to search"
+          placeholder="Type to search..."
           value={inputValue()}
           onBlur={(e) => {
             e.target.focus();
@@ -102,22 +104,19 @@ const App = () => {
         <kbd>{shortcut()}</kbd>
       </div>
       <ul class={styles.list}>
-        <For each={filteredCommands()}>
-          {(match, i) => {
-            let el;
-            let { obj } = match;
+        <For each={matches().map((match) => match.obj)}>
+          {(obj, i) => {
             const isSelected = () => i() === selectedI();
-            createEffect(() => {
-              if (isSelected())
-                el.scrollIntoView({ behavior: "auto", block: "nearest" });
-            });
-            const text = !parsedInput().query
-              ? obj.name
-              : fuzzysort.highlight(match, sep, sep);
+            const entry = createMemo(() => {
+              const text = !parsedInput().query
+                ? obj.name
+                : fuzzysort.highlight(matches()[i()], sep, sep) || obj.name;
+              const idx = text.indexOf("\n");
+              const item = idx === -1 ? text : text.slice(0, idx);
 
-            const idx = text.indexOf("\n");
-            const item = idx === -1 ? text : text.slice(0, idx);
-            const subitem = idx === -1 ? "" : text.slice(idx + 1);
+              const subitem = idx === -1 ? "" : text.slice(idx + 1);
+              return { item, subitem };
+            });
 
             return (
               <li
@@ -127,24 +126,35 @@ const App = () => {
                 }}
                 onMouseMove={() => setSelectedI(i())}
                 onclick={() => obj.command()}
-                ref={el}
+                ref={(el) => {
+                  createEffect(() => {
+                    if (isSelected())
+                      el.scrollIntoView({ behavior: "auto", block: "nearest" });
+                  });
+                }}
               >
                 <Show when={obj.icon}>
-                  <img
-                    classList={{
-                      [styles.img]: true,
-                      [styles.img_big]: !!subitem,
-                    }}
-                    src={faviconURL(obj.icon)}
-                    alt=""
-                  />
+                  {(icon) => (
+                    <img
+                      classList={{
+                        [styles.img]: true,
+                        [styles.img_big]: !!entry().subitem,
+                      }}
+                      src={faviconURL(icon())}
+                      alt=""
+                    />
+                  )}
                 </Show>
 
                 <div>
-                  {item.split(sep).map((t, i) => (i % 2 ? <b>{t}</b> : t))}
+                  {entry()
+                    .item.split(sep)
+                    .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
                   <br />
                   <span class={styles.subitem}>
-                    {subitem.split(sep).map((t, i) => (i % 2 ? <b>{t}</b> : t))}
+                    {entry()
+                      .subitem.split(sep)
+                      .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
                   </span>
                 </div>
                 <Show when={obj.shortcut}>
