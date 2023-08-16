@@ -48,7 +48,7 @@ const allCommands = createMemo(() => {
 const matches = createMemo(() => {
   return fuzzysort.go(parsedInput().query, allCommands(), {
     threshold: -Infinity, // Don't return matches worse than this (higher is faster)
-    limit: 100, // Don't return more results than this (lower is faster)
+    limit: 50, // Don't return more results than this (lower is faster)
     all: true, // If true, returns all results for an empty search
     key: "name", // For when targets are objects (see its example usage)
     // keys: null, // For when targets are objects (see its example usage)
@@ -80,7 +80,6 @@ function faviconURL(u: string) {
   const url = new URL(chrome.runtime.getURL("/_favicon/"));
   url.searchParams.set("pageUrl", u);
   url.searchParams.set("size", "32");
-  console.log("favico", u);
   return url.toString();
 }
 const sep = String.fromCharCode(0);
@@ -96,12 +95,13 @@ const Item = (props: {
       ? props.command.name
       : fuzzysort.highlight(props.keyResult, sep, sep) || props.command.name;
     const idx = text.indexOf("\n");
-    const item = idx === -1 ? text : text.slice(0, idx);
-    const subitem = idx === -1 ? "" : text.slice(idx + 1);
-    console.log("entry");
-    return { item, subitem };
+    const itemText = idx === -1 ? text : text.slice(0, idx);
+    const subitemText = idx === -1 ? "" : text.slice(idx + 1);
+    return { itemText, subitemText };
   });
-
+  const itemText = createMemo(() => entry().itemText);
+  const subitemText = createMemo(() => entry().subitemText);
+  const hasSubitem = createMemo(() => props.command.name.includes("\n"));
   return (
     <li
       classList={{
@@ -122,7 +122,7 @@ const Item = (props: {
           <img
             classList={{
               [styles.img]: true,
-              [styles.img_big]: props.command.name.includes("\n"),
+              [styles.img_big]: hasSubitem(),
             }}
             src={faviconURL(icon())}
             alt=""
@@ -131,13 +131,13 @@ const Item = (props: {
       </Show>
 
       <div>
-        {entry()
-          .item.split(sep)
+        {itemText()
+          .split(sep)
           .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
         <br />
         <span class={styles.subitem}>
-          {entry()
-            .subitem.split(sep)
+          {subitemText()
+            .split(sep)
             .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
         </span>
       </div>
