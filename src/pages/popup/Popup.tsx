@@ -80,9 +80,73 @@ function faviconURL(u: string) {
   const url = new URL(chrome.runtime.getURL("/_favicon/"));
   url.searchParams.set("pageUrl", u);
   url.searchParams.set("size", "32");
+  console.log("favico", u);
   return url.toString();
 }
 const sep = String.fromCharCode(0);
+
+const Item = (props: {
+  isSelected: boolean;
+  setSelected: () => void;
+  command: Command;
+  keyResult: Fuzzysort.KeyResult<Command>;
+}) => {
+  const entry = createMemo(() => {
+    const text = !parsedInput().query
+      ? props.command.name
+      : fuzzysort.highlight(props.keyResult, sep, sep) || props.command.name;
+    const idx = text.indexOf("\n");
+    const item = idx === -1 ? text : text.slice(0, idx);
+    const subitem = idx === -1 ? "" : text.slice(idx + 1);
+    console.log("entry");
+    return { item, subitem };
+  });
+
+  return (
+    <li
+      classList={{
+        [styles.selected]: props.isSelected,
+        [styles.li]: true,
+      }}
+      onMouseMove={props.setSelected}
+      onclick={() => props.command.command()}
+      ref={(el) => {
+        createEffect(() => {
+          if (props.isSelected)
+            el.scrollIntoView({ behavior: "auto", block: "nearest" });
+        });
+      }}
+    >
+      <Show when={props.command.icon}>
+        {(icon) => (
+          <img
+            classList={{
+              [styles.img]: true,
+              [styles.img_big]: props.command.name.includes("\n"),
+            }}
+            src={faviconURL(icon())}
+            alt=""
+          />
+        )}
+      </Show>
+
+      <div>
+        {entry()
+          .item.split(sep)
+          .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
+        <br />
+        <span class={styles.subitem}>
+          {entry()
+            .subitem.split(sep)
+            .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
+        </span>
+      </div>
+      <Show when={props.command.shortcut}>
+        <kbd>{props.command.shortcut}</kbd>
+      </Show>
+    </li>
+  );
+};
 
 const App = () => {
   return (
@@ -105,64 +169,14 @@ const App = () => {
       </div>
       <ul class={styles.list}>
         <For each={matches().map((match) => match.obj)}>
-          {(obj, i) => {
-            const isSelected = () => i() === selectedI();
-            const entry = createMemo(() => {
-              const text = !parsedInput().query
-                ? obj.name
-                : fuzzysort.highlight(matches()[i()], sep, sep) || obj.name;
-              const idx = text.indexOf("\n");
-              const item = idx === -1 ? text : text.slice(0, idx);
-
-              const subitem = idx === -1 ? "" : text.slice(idx + 1);
-              return { item, subitem };
-            });
-
-            return (
-              <li
-                classList={{
-                  [styles.selected]: isSelected(),
-                  [styles.li]: true,
-                }}
-                onMouseMove={() => setSelectedI(i())}
-                onclick={() => obj.command()}
-                ref={(el) => {
-                  createEffect(() => {
-                    if (isSelected())
-                      el.scrollIntoView({ behavior: "auto", block: "nearest" });
-                  });
-                }}
-              >
-                <Show when={obj.icon}>
-                  {(icon) => (
-                    <img
-                      classList={{
-                        [styles.img]: true,
-                        [styles.img_big]: !!entry().subitem,
-                      }}
-                      src={faviconURL(icon())}
-                      alt=""
-                    />
-                  )}
-                </Show>
-
-                <div>
-                  {entry()
-                    .item.split(sep)
-                    .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
-                  <br />
-                  <span class={styles.subitem}>
-                    {entry()
-                      .subitem.split(sep)
-                      .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
-                  </span>
-                </div>
-                <Show when={obj.shortcut}>
-                  <kbd>{obj.shortcut}</kbd>
-                </Show>
-              </li>
-            );
-          }}
+          {(command, i) => (
+            <Item
+              isSelected={i() === selectedI()}
+              keyResult={matches()[i()]}
+              setSelected={() => setSelectedI(i())}
+              command={command}
+            />
+          )}
         </For>
       </ul>
     </div>

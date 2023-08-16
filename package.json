@@ -10,7 +10,7 @@
   },
   "scripts": {
     "serve": "vite --open 'http://127.0.0.1:5173/src/pages/popup/index.html'",
-    "start": "vite build --watch",
+    "start": "vite build --watch --minify false",
     "build": "vite build",
     "lint": "eslint . --fix -c .eslintrc --ext js,ts --ignore-pattern='!.*'",
     "dev:nodemon": "nodemon",
