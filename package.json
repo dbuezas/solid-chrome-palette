@@ -23,6 +23,7 @@
     "date-fns": "^2.30.0",
     "fuse.js": "^6.6.2",
     "fuzzysort": "^2.0.4",
+    "solid-infinite-scroll": "^1.0.1",
     "solid-js": "^1.6.2",
     "tinykeys": "^1.4.0",
     "webextension-polyfill": "^0.10.0"

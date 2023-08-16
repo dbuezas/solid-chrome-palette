@@ -1,7 +1,8 @@
 // render inside top level Solid component
 
 import fuzzysort from "fuzzysort";
-import { For, Show, createEffect, createMemo, createSignal } from "solid-js";
+import InfiniteScroll from "solid-infinite-scroll";
+import { Show, createEffect, createMemo, createSignal } from "solid-js";
 import tinykeys from "tinykeys"; // Or `window.tinykeys` using the CDN version
 import browser from "webextension-polyfill";
 import styles from "./Popup.module.css";
@@ -47,8 +48,8 @@ const allCommands = createMemo(() => {
 
 const matches = createMemo(() => {
   return fuzzysort.go(parsedInput().query, allCommands(), {
-    threshold: -Infinity, // Don't return matches worse than this (higher is faster)
-    limit: 50, // Don't return more results than this (lower is faster)
+    threshold: -10000, // don't return bad results
+    //limit: 50, // Don't return more results than this (lower is faster)
     all: true, // If true, returns all results for an empty search
     key: "name", // For when targets are objects (see its example usage)
     // keys: null, // For when targets are objects (see its example usage)
@@ -149,6 +150,13 @@ const Item = (props: {
 };
 
 const App = () => {
+  const [scrollIndex, setScrollIndex] = createSignal(50);
+  const scrollNext = () =>
+    setScrollIndex(Math.min(scrollIndex() + 50, matches().length));
+  createEffect(() => {
+    inputValue();
+    setScrollIndex(50);
+  });
   return (
     <div class={styles.App}>
       <div class={styles.input_wrap}>
@@ -168,7 +176,13 @@ const App = () => {
         <kbd>{shortcut()}</kbd>
       </div>
       <ul class={styles.list}>
-        <For each={matches().map((match) => match.obj)}>
+        <InfiniteScroll
+          each={matches()
+            .slice(0, scrollIndex())
+            .map((match) => match.obj)}
+          hasMore={scrollIndex() < matches().length}
+          next={scrollNext}
+        >
           {(command, i) => (
             <Item
               isSelected={i() === selectedI()}
@@ -177,7 +191,7 @@ const App = () => {
               command={command}
             />
           )}
-        </For>
+        </InfiniteScroll>
       </ul>
     </div>
   );
