@@ -1,7 +1,7 @@
 const KEYWORD = "h";
 
 import { formatDistanceToNow } from "date-fns";
-import browser from "webextension-polyfill";
+import browser from "~/browser";
 import { createLazyResource, matchCommand, setInput } from "../signals";
 import { Command } from "./commandsSuggestions";
 import niceUrl from "./niceUrl";

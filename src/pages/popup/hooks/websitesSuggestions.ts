@@ -1,4 +1,4 @@
-import browser from "webextension-polyfill";
+import browser from "~/browser";
 import { matchCommand, parsedInput, setInput } from "../signals";
 
 type Template = {

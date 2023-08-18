@@ -4,7 +4,7 @@ import fuzzysort from "fuzzysort";
 import InfiniteScroll from "solid-infinite-scroll";
 import { Show, createEffect, createMemo, createSignal } from "solid-js";
 import tinykeys from "tinykeys"; // Or `window.tinykeys` using the CDN version
-import browser from "webextension-polyfill";
+import browser from "~/browser";
 import styles from "./Popup.module.css";
 import { audibleTabSuggestions } from "./hooks/audioSuggestions";
 import { bookmarkSuggestions } from "./hooks/bookmarkSuggestions";
@@ -16,15 +16,8 @@ import { websitesSuggestions } from "./hooks/websitesSuggestions";
 import { sortByUsed, storeLastUsed } from "./last-used";
 import { createLazyResource, inputSignal, parsedInput } from "./signals";
 
-const [selectedI_internal, setSelectedI] = createSignal(0);
-
-const selectedI = () => {
-  const n = filteredCommands().length;
-  return ((selectedI_internal() % n) + n) % n;
-};
-
 const shortcut = createLazyResource("unset", async () => {
-  const commands = await browser?.commands?.getAll();
+  const commands = await browser.commands.getAll();
   const mainCommand = commands.find(({ name }) => name === "_execute_action");
   if (mainCommand?.shortcut) return mainCommand.shortcut;
   return "unset";
@@ -46,10 +39,12 @@ const allCommands = createMemo(() => {
   return commands;
 });
 
+const [scrollIndex, setScrollIndex] = createSignal(50);
+
 const matches = createMemo(() => {
   return fuzzysort.go(parsedInput().query, allCommands(), {
     threshold: -10000, // don't return bad results
-    //limit: 50, // Don't return more results than this (lower is faster)
+    limit: scrollIndex(), // Don't return more results than this (lower is faster)
     all: true, // If true, returns all results for an empty search
     key: "name", // For when targets are objects (see its example usage)
     // keys: null, // For when targets are objects (see its example usage)
@@ -58,6 +53,13 @@ const matches = createMemo(() => {
 });
 const filteredCommands = createMemo(() => {
   return matches().map((match) => match.obj);
+});
+
+const [selectedI_internal, setSelectedI] = createSignal(0);
+
+const selectedI = createMemo(() => {
+  const n = filteredCommands().length;
+  return ((selectedI_internal() % n) + n) % n;
 });
 
 tinykeys(window, {
@@ -78,7 +80,7 @@ tinykeys(window, {
   },
 });
 function faviconURL(u: string) {
-  const url = new URL(chrome.runtime.getURL("/_favicon/"));
+  const url = new URL(browser.runtime.getURL("/_favicon/"));
   url.searchParams.set("pageUrl", u);
   url.searchParams.set("size", "32");
   return url.toString();
@@ -92,6 +94,7 @@ const Item = (props: {
   keyResult: Fuzzysort.KeyResult<Command>;
 }) => {
   const entry = createMemo(() => {
+    console.log("entry memo");
     const text = !parsedInput().query
       ? props.command.name
       : fuzzysort.highlight(props.keyResult, sep, sep) || props.command.name;
@@ -113,8 +116,9 @@ const Item = (props: {
       onclick={() => props.command.command()}
       ref={(el) => {
         createEffect(() => {
-          if (props.isSelected)
+          if (props.isSelected) {
             el.scrollIntoView({ behavior: "auto", block: "nearest" });
+          }
         });
       }}
     >
@@ -150,9 +154,6 @@ const Item = (props: {
 };
 
 const App = () => {
-  const [scrollIndex, setScrollIndex] = createSignal(50);
-  const scrollNext = () =>
-    setScrollIndex(Math.min(scrollIndex() + 50, matches().length));
   createEffect(() => {
     inputValue();
     setScrollIndex(50);
@@ -177,20 +178,22 @@ const App = () => {
       </div>
       <ul class={styles.list}>
         <InfiniteScroll
-          each={matches()
-            .slice(0, scrollIndex())
-            .map((match) => match.obj)}
-          hasMore={scrollIndex() < matches().length}
-          next={scrollNext}
+          loadingMessage={<></>}
+          each={filteredCommands()}
+          hasMore={true}
+          next={() => setScrollIndex(scrollIndex() + 50)}
         >
-          {(command, i) => (
-            <Item
-              isSelected={i() === selectedI()}
-              keyResult={matches()[i()]}
-              setSelected={() => setSelectedI(i())}
-              command={command}
-            />
-          )}
+          {(command, i) => {
+            const isSelected = createMemo(() => i() === selectedI());
+            return (
+              <Item
+                isSelected={isSelected()}
+                keyResult={matches()[i()]}
+                setSelected={() => setSelectedI(i())}
+                command={command}
+              />
+            );
+          }}
         </InfiniteScroll>
       </ul>
     </div>

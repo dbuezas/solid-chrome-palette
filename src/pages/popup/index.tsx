@@ -1,3 +1,7 @@
+if (import.meta.env.DEV) {
+  await import("solid-devtools");
+}
+
 import { render } from "solid-js/web";
 import Popup from "./Popup";
 import "./index.css";

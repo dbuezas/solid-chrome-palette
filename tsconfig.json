@@ -20,7 +20,8 @@
     "paths": {
       "@src/*": ["src/*"],
       "@assets/*": ["src/assets/*"],
-      "@pages/*": ["src/pages/*"]
+      "@pages/*": ["src/pages/*"],
+      "~/*": ["src/pages/popup/*"]
     }
   },
   "include": [

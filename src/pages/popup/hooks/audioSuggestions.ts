@@ -1,4 +1,4 @@
-import browser from "webextension-polyfill";
+import browser from "~/browser";
 import { createLazyResource, parsedInput } from "../signals";
 import { Command } from "./commandsSuggestions";
 

@@ -1,6 +1,6 @@
 const KEYWORD = "t";
 
-import browser from "webextension-polyfill";
+import browser from "~/browser";
 import { createLazyResource, matchCommand, setInput } from "../signals";
 import niceUrl from "./niceUrl";
 

@@ -1,6 +1,6 @@
 // adapted from https://github.com/ssundarraj/commander/blob/master/src/js/actions.js
 
-import browser from "webextension-polyfill";
+import browser from "~/browser";
 import { resetHistory } from "../last-used";
 import { inputSignal, parsedInput } from "../signals";
 

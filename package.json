@@ -9,7 +9,7 @@
     "url": "https://github.com/fuyutarow/solid-chrome-extension-template.git"
   },
   "scripts": {
-    "serve": "vite --open 'http://127.0.0.1:5173/src/pages/popup/index.html'",
+    "serve": "vite dev --open 'http://127.0.0.1:5173/src/pages/popup/index.html'",
     "start": "vite build --watch --minify false",
     "build": "vite build",
     "lint": "eslint . --fix -c .eslintrc --ext js,ts --ignore-pattern='!.*'",
@@ -51,6 +51,7 @@
     "postcss": "^8.4.19",
     "prettier": "2.8.0",
     "sass": "1.56.1",
+    "solid-devtools": "^0.27.7",
     "ts-jest": "^29.0.3",
     "ts-loader": "9.4.2",
     "ts-node": "10.9.1",
