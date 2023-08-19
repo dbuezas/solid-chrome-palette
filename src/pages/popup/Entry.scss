@@ -34,13 +34,13 @@ li.Entry {
       font-weight: 300;
       font-size: 12px;
       .time_ago {
-        text-wrap: nowrap;
         float: right;
         margin-top: 5px;
         margin-left: 5px;
         color: #757575;
         font-style: italic;
         font-size: 10px;
+        white-space: nowrap;
       }
     }
   }

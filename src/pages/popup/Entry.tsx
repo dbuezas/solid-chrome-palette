@@ -11,7 +11,7 @@ import { parsedInput } from "~/signals";
 
 import Shortcut from "./Shortcut";
 
-const sep = String.fromCharCode(0);
+const delimiter = String.fromCharCode(0);
 function faviconURL(u: string) {
   const url = new URL(browser.runtime.getURL("/_favicon/"));
   url.searchParams.set("pageUrl", u);
@@ -26,13 +26,13 @@ export default function Entry(props: {
   keyResult: Fuzzysort.KeyResult<Command>;
 }) {
   const entry = createMemo(() => {
-    console.log("entry memo");
     const text = !parsedInput().query
       ? props.command.name
-      : fuzzysort.highlight(props.keyResult, sep, sep) || props.command.name;
-    const idx = text.indexOf("\n");
-    const itemText = idx === -1 ? text : text.slice(0, idx);
-    const subitemText = idx === -1 ? "" : text.slice(idx + 1);
+      : fuzzysort.highlight(props.keyResult, delimiter, delimiter) ||
+        props.command.name;
+    const i = text.indexOf("\n");
+    const itemText = i === -1 ? text : text.slice(0, i);
+    const subitemText = i === -1 ? "" : text.slice(i + 1);
     return { itemText, subitemText };
   });
   const itemText = createMemo(() => entry().itemText);
@@ -70,12 +70,12 @@ export default function Entry(props: {
       <div class="text">
         <div class="item">
           {itemText()
-            .split(sep)
+            .split(delimiter)
             .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
         </div>
         <div class="subitem">
           {subitemText()
-            .split(sep)
+            .split(delimiter)
             .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
           <Show when={props.command.lastVisitTime}>
             {(time) => (

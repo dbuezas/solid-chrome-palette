@@ -2,7 +2,7 @@ import "./index.scss";
 
 import { render } from "solid-js/web";
 
-import Popup from "./Popup";
+import App from "./App";
 
 if (import.meta.env.DEV) {
   await import("solid-devtools");
@@ -13,4 +13,4 @@ if (!appContainer) {
   throw new Error("Can not find AppContainer");
 }
 
-render(Popup, appContainer);
+render(App, appContainer);

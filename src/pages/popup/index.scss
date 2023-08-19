@@ -1,23 +1,26 @@
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background-color: #323232;
-    --text-color: #ccc;
-    --shadow-color: #111;
-    --highlight: #666;
-    --highlight-color: #eee;
-    --primary: #54a9f8;
-  }
+body[theme="Dark"] {
+  --background-color: #323232;
+  --text-color: #ccc;
+  --shadow-color: #111;
+  --highlight: #666;
+  --highlight-color: #eee;
+  --primary: #54a9f8;
 }
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --background-color: #fefefe;
-    --text-color: #222;
-    --shadow-color: #e0ecf9;
-    --highlight: #f1f5f9;
-    --highlight-color: #000;
-    --primary: #54a9f8;
-  }
+body[theme="Light"] {
+  --background-color: #fefefe;
+  --text-color: #222;
+  --shadow-color: #e0ecf9;
+  --highlight: #f1f5f9;
+  --highlight-color: #000;
+  --primary: #54a9f8;
+}
+body[theme="Github"] {
+  --background-color: #25292e;
+  --text-color: #e2e4e8;
+  --shadow-color: #2a3748;
+  --highlight: #81b0f0;
+  --highlight-color: #000;
+  --primary: #9de5a4;
 }
 
 body {

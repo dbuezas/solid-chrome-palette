@@ -1,4 +1,4 @@
-import "./Popup.scss";
+import "./App.scss";
 
 import fuzzysort from "fuzzysort";
 import InfiniteScroll from "solid-infinite-scroll";
@@ -15,6 +15,7 @@ import { bookmarkThisSuggestions } from "./hooks/bookmarkThisSuggestions";
 import commandSuggestions, { Command } from "./hooks/commandsSuggestions";
 import { historySuggestions } from "./hooks/historySuggestions";
 import { switchTabSuggestions } from "./hooks/tabsSuggestions";
+import { themeSuggestions } from "./hooks/themes";
 import { websitesSuggestions } from "./hooks/websitesSuggestions";
 import { sortByUsed, storeLastUsed } from "./last-used";
 import { createLazyResource, inputSignal, parsedInput } from "./signals";
@@ -37,6 +38,7 @@ const allCommands = createMemo(() => {
     ...bookmarkSuggestions(),
     ...bookmarkThisSuggestions(),
     ...websitesSuggestions(),
+    ...themeSuggestions(),
   ];
   sortByUsed(commands);
   return commands;

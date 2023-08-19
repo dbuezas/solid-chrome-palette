@@ -1,11 +1,11 @@
-import { Setter, createMemo, createSignal } from "solid-js";
+import { Setter, createEffect, createMemo, createSignal } from "solid-js";
 
 export const inputSignal = createSignal("");
 
 export const [input, setInput] = inputSignal;
 
 export const parsedInput = createMemo(() => {
-  const [match, keyword, query] = input().match(/^([a-zA-Z]{1,2})>(.*)/) || [];
+  const [match, keyword, query] = input().match(/^([a-zA-Z]+)>(.*)/) || [];
   return {
     isCommand: match !== undefined,
     keyword: keyword?.toLowerCase() || "",
@@ -35,4 +35,17 @@ export const createLazyResource = <T,>(
     }
     return val();
   };
+};
+
+export const createStoredSignal = <T,>(key: string, defaultValue: T) => {
+  let initial = defaultValue;
+  try {
+    const stored = localStorage.getItem(key);
+    if (stored !== null) initial = JSON.parse(stored);
+  } catch (e) {}
+  const signal = createSignal(initial);
+  createEffect(() => {
+    localStorage.setItem(key, JSON.stringify(signal[0]()));
+  }, true);
+  return signal;
 };
