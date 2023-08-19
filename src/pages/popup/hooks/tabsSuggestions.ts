@@ -1,8 +1,10 @@
-const KEYWORD = "t";
-
 import browser from "~/browser";
+
 import { createLazyResource, matchCommand, setInput } from "../signals";
+import { Command } from "./commandsSuggestions";
 import niceUrl from "./niceUrl";
+
+const KEYWORD = "t";
 
 const commands = createLazyResource([], async () => {
   const allTabs = await browser.tabs.query({});
@@ -17,7 +19,7 @@ const commands = createLazyResource([], async () => {
         browser.windows.update(windowId!, { focused: true });
         window.close();
       },
-    };
+    } satisfies Command;
   });
 });
 
@@ -29,7 +31,7 @@ const base = [
       setInput(KEYWORD + ">");
     },
     keyword: KEYWORD + ">",
-    shortcut: "TODO",
+    icon: "about:blank",
   },
 ];
 

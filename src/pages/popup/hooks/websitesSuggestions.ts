@@ -42,7 +42,6 @@ const base = templates.map((template) => ({
     setInput(template.keyword + ">");
   },
   keyword: template.keyword + ">",
-  shortcut: "todo",
 }));
 
 export function websitesSuggestions() {

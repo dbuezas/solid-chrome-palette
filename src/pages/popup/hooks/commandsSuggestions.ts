@@ -8,7 +8,7 @@ export type Command = {
   name: string;
   category?: string;
   shortcut?: string;
-  timeAgo?: string;
+  lastVisitTime?: number;
   keyword?: string;
   command: Function;
   icon?: string;
@@ -60,6 +60,13 @@ const base: Command[] = [
     category: "Command",
     command: async function () {
       await browser.tabs.create({ url: "chrome://extensions" });
+    },
+  },
+  {
+    name: "Open Extension Shortcuts",
+    category: "Command",
+    command: async function () {
+      await browser.tabs.create({ url: "chrome://extensions/shortcuts" });
     },
   },
   {

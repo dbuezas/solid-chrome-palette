@@ -1,6 +1,5 @@
 const KEYWORD = "h";
 
-import { formatDistanceToNow } from "date-fns";
 import browser from "~/browser";
 import { createLazyResource, matchCommand, setInput } from "../signals";
 import { Command } from "./commandsSuggestions";
@@ -35,12 +34,12 @@ const commands = createLazyResource<Command[]>([], async (setVal) => {
             name: `${title || "Untitled"}\n${niceUrl(url)}`,
             category: "History",
             // keyword: url.slice(0, 100),
-            timeAgo: formatDistanceToNow(lastVisitTime || 0),
+            lastVisitTime,
             icon: url,
             command: async function () {
               await browser.tabs.create({ url });
             },
-          };
+          } satisfies Command;
         })
         .filter(isDefined);
       list = [...list, ...more];
@@ -63,7 +62,6 @@ const base = [
       setInput(KEYWORD + ">");
     },
     keyword: KEYWORD + ">",
-    shortcut: "todo",
   },
 ];
 export function historySuggestions() {

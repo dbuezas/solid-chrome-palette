@@ -1,11 +1,14 @@
-// render inside top level Solid component
+import "./Popup.scss";
 
 import fuzzysort from "fuzzysort";
 import InfiniteScroll from "solid-infinite-scroll";
-import { Show, createEffect, createMemo, createSignal } from "solid-js";
-import tinykeys from "tinykeys"; // Or `window.tinykeys` using the CDN version
+import { createEffect, createMemo, createSignal } from "solid-js";
+import tinykeys from "tinykeys";
+
 import browser from "~/browser";
-import styles from "./Popup.module.css";
+
+import Entry from "./Entry";
+import Shortcut from "./Shortcut";
 import { audibleTabSuggestions } from "./hooks/audioSuggestions";
 import { bookmarkSuggestions } from "./hooks/bookmarkSuggestions";
 import { bookmarkThisSuggestions } from "./hooks/bookmarkThisSuggestions";
@@ -79,79 +82,6 @@ tinykeys(window, {
     setSelectedI(0);
   },
 });
-function faviconURL(u: string) {
-  const url = new URL(browser.runtime.getURL("/_favicon/"));
-  url.searchParams.set("pageUrl", u);
-  url.searchParams.set("size", "32");
-  return url.toString();
-}
-const sep = String.fromCharCode(0);
-
-const Item = (props: {
-  isSelected: boolean;
-  setSelected: () => void;
-  command: Command;
-  keyResult: Fuzzysort.KeyResult<Command>;
-}) => {
-  const entry = createMemo(() => {
-    console.log("entry memo");
-    const text = !parsedInput().query
-      ? props.command.name
-      : fuzzysort.highlight(props.keyResult, sep, sep) || props.command.name;
-    const idx = text.indexOf("\n");
-    const itemText = idx === -1 ? text : text.slice(0, idx);
-    const subitemText = idx === -1 ? "" : text.slice(idx + 1);
-    return { itemText, subitemText };
-  });
-  const itemText = createMemo(() => entry().itemText);
-  const subitemText = createMemo(() => entry().subitemText);
-  const hasSubitem = createMemo(() => props.command.name.includes("\n"));
-  return (
-    <li
-      classList={{
-        [styles.selected]: props.isSelected,
-        [styles.li]: true,
-      }}
-      onMouseMove={props.setSelected}
-      onclick={() => props.command.command()}
-      ref={(el) => {
-        createEffect(() => {
-          if (props.isSelected) {
-            el.scrollIntoView({ behavior: "auto", block: "nearest" });
-          }
-        });
-      }}
-    >
-      <Show when={props.command.icon}>
-        {(icon) => (
-          <img
-            classList={{
-              [styles.img]: true,
-              [styles.img_big]: hasSubitem(),
-            }}
-            src={faviconURL(icon())}
-            alt=""
-          />
-        )}
-      </Show>
-
-      <div>
-        {itemText()
-          .split(sep)
-          .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
-        <br />
-        <span class={styles.subitem}>
-          {subitemText()
-            .split(sep)
-            .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
-        </span>
-      </div>
-      <Show when={props.command.shortcut}>
-        <kbd>{props.command.shortcut}</kbd>
-      </Show>
-    </li>
-  );
-};
 
 const App = () => {
   createEffect(() => {
@@ -159,10 +89,10 @@ const App = () => {
     setScrollIndex(50);
   });
   return (
-    <div class={styles.App}>
-      <div class={styles.input_wrap}>
+    <div class="App">
+      <div class="input_wrap">
         <input
-          class={styles.input}
+          class="input"
           autofocus
           placeholder="Type to search..."
           value={inputValue()}
@@ -174,9 +104,9 @@ const App = () => {
             setSelectedI(0);
           }}
         />
-        <kbd>{shortcut()}</kbd>
+        <Shortcut keys={shortcut()} />
       </div>
-      <ul class={styles.list}>
+      <ul class="list">
         <InfiniteScroll
           loadingMessage={<></>}
           each={filteredCommands()}
@@ -186,7 +116,7 @@ const App = () => {
           {(command, i) => {
             const isSelected = createMemo(() => i() === selectedI());
             return (
-              <Item
+              <Entry
                 isSelected={isSelected()}
                 keyResult={matches()[i()]}
                 setSelected={() => setSelectedI(i())}

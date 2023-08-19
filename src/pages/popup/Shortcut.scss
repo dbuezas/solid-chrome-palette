@@ -1,0 +1,30 @@
+.Shortcut {
+  align-self: center;
+  > kbd {
+    display: inline-block;
+    margin-left: 5px;
+    border: 1px solid var(--shadow-color); //#cbd5e1;
+    border-radius: 4px;
+    background-color: var(--highlight); //#f1f5f9;
+    padding: 2px;
+    width: 12px;
+    color: var(--highlight-color); //#1e293b;
+    font-size: 12px;
+    font-family: sans-serif;
+    text-align: center;
+    text-transform: capitalize;
+  }
+}
+
+// display: inline-block;
+// margin-left: 5px;
+// border: 1px solid #5e5e5e;
+// border-radius: 4px;
+// background-color: #7c7c7c;
+// padding: 2px;
+// width: 12px;
+// color: #000000;
+// font-size: 12px;
+// font-family: sans-serif;
+// text-align: center;
+// text-transform: capitalize;
