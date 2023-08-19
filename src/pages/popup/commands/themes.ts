@@ -1,7 +1,8 @@
 import { createEffect, createMemo, createSignal } from "solid-js";
 
-import { createStoredSignal, matchCommand, setInput } from "../signals";
-import { Command } from "./commandsSuggestions";
+import { createStoredSignal, matchCommand, setInput } from "~/util/signals";
+
+import { Command } from "./general";
 
 const KEYWORD = "theme";
 

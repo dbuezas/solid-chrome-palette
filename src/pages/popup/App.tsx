@@ -5,20 +5,19 @@ import InfiniteScroll from "solid-infinite-scroll";
 import { createEffect, createMemo, createSignal } from "solid-js";
 import tinykeys from "tinykeys";
 
-import browser from "~/browser";
-
 import Entry from "./Entry";
 import Shortcut from "./Shortcut";
-import audibleTabSuggestions from "./hooks/audioSuggestions";
-import bookmarkSuggestions from "./hooks/bookmarkSuggestions";
-import bookmarkThisSuggestions from "./hooks/bookmarkThisSuggestions";
-import commandSuggestions, { Command } from "./hooks/commandsSuggestions";
-import historySuggestions from "./hooks/historySuggestions";
-import switchTabSuggestions from "./hooks/tabsSuggestions";
-import themeSuggestions from "./hooks/themes";
-import websitesSuggestions from "./hooks/websitesSuggestions";
-import { sortByUsed, storeLastUsed } from "./last-used";
-import { createLazyResource, inputSignal, parsedInput } from "./signals";
+import audibleTabSuggestions from "./commands/audio";
+import bookmarkThisSuggestions from "./commands/bookmark-this";
+import bookmarkSuggestions from "./commands/bookmarks";
+import commandSuggestions, { Command } from "./commands/general";
+import historySuggestions from "./commands/history";
+import switchTabSuggestions from "./commands/tabs";
+import themeSuggestions from "./commands/themes";
+import websitesSuggestions from "./commands/website-search";
+import browser from "./util/browser";
+import { sortByUsed, storeLastUsed } from "./util/last-used";
+import { createLazyResource, inputSignal, parsedInput } from "./util/signals";
 
 const shortcut = createLazyResource("unset", async () => {
   const commands = await browser.commands.getAll();

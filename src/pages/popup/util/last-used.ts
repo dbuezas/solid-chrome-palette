@@ -1,4 +1,4 @@
-import { Command } from "./hooks/commandsSuggestions";
+import { Command } from "~/commands/general";
 
 let store: string[] = JSON.parse(localStorage.lastUsed || "[]");
 

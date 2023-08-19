@@ -5,11 +5,11 @@ import { formatDistanceToNow } from "date-fns";
 import fuzzysort from "fuzzysort";
 import { Show, createEffect, createMemo } from "solid-js";
 
-import browser from "~/browser";
-import { Command } from "~/hooks/commandsSuggestions";
-import { parsedInput } from "~/signals";
+import browser from "~/util/browser";
 
 import Shortcut from "./Shortcut";
+import { Command } from "./commands/general";
+import { parsedInput } from "./util/signals";
 
 function faviconURL(u: string) {
   const url = new URL(browser.runtime.getURL("/_favicon/"));

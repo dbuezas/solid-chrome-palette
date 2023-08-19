@@ -1,8 +1,8 @@
-import browser from "~/browser";
+import browser from "~/util/browser";
+import niceUrl from "~/util/nice-url";
+import { createLazyResource, matchCommand, setInput } from "~/util/signals";
 
-import { createLazyResource, matchCommand, setInput } from "../signals";
-import { Command } from "./commandsSuggestions";
-import niceUrl from "./niceUrl";
+import { Command } from "./general";
 
 const KEYWORD = "h";
 

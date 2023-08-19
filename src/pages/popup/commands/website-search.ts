@@ -1,7 +1,7 @@
-import browser from "~/browser";
+import browser from "~/util/browser";
+import { matchCommand, parsedInput, setInput } from "~/util/signals";
 
-import { matchCommand, parsedInput, setInput } from "../signals";
-import { Command } from "./commandsSuggestions";
+import { Command } from "./general";
 
 type Template = {
   title: string;

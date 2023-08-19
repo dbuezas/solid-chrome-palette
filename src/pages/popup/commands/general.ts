@@ -1,8 +1,7 @@
 // adapted from https://github.com/ssundarraj/commander/blob/master/src/js/actions.js
-import browser from "~/browser";
-
-import { resetHistory } from "../last-used";
-import { inputSignal, parsedInput } from "../signals";
+import browser from "~/util/browser";
+import { resetHistory } from "~/util/last-used";
+import { inputSignal, parsedInput } from "~/util/signals";
 
 export type Command = {
   title: string;

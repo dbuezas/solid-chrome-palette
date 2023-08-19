@@ -1,7 +1,7 @@
-import browser from "~/browser";
+import browser from "~/util/browser";
+import { createLazyResource, matchCommand, setInput } from "~/util/signals";
 
-import { createLazyResource, matchCommand, setInput } from "../signals";
-import { Command } from "./commandsSuggestions";
+import { Command } from "./general";
 
 const KEYWORD = "bt";
 

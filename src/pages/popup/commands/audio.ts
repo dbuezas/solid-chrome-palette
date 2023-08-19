@@ -1,7 +1,7 @@
-import browser from "~/browser";
+import browser from "~/util/browser";
+import { createLazyResource, parsedInput } from "~/util/signals";
 
-import { createLazyResource, parsedInput } from "../signals";
-import { Command } from "./commandsSuggestions";
+import { Command } from "./general";
 
 const commands = createLazyResource([], async () => {
   const allTabs = await browser.tabs.query({ audible: true });

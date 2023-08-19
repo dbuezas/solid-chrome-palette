@@ -21,8 +21,7 @@
 // if (!import.meta.env.DEV) {
 //   browser = await import("webextension-polyfill");
 // }
-
 // export default browser;
-
 import browser from "webextension-polyfill";
+
 export default browser;
