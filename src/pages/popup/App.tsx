@@ -66,6 +66,11 @@ const selectedI = createMemo(() => {
   return ((selectedI_internal() % n) + n) % n;
 });
 
+createEffect(() => {
+  inputValue();
+  setSelectedI(0);
+});
+
 tinykeys(window, {
   ArrowUp: (e) => {
     e.preventDefault();
@@ -80,7 +85,6 @@ tinykeys(window, {
     const selected = filteredCommands()[selectedI()];
     selected.command();
     storeLastUsed(selected);
-    setSelectedI(0);
   },
 });
 
@@ -105,7 +109,12 @@ const App = () => {
             setSelectedI(0);
           }}
         />
-        <Shortcut keys={shortcut()} />
+        <Shortcut
+          onClick={() =>
+            browser.tabs.create({ url: "chrome://extensions/shortcuts" })
+          }
+          keys={shortcut()}
+        />
       </div>
       <ul class="list">
         <InfiniteScroll
