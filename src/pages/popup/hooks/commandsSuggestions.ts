@@ -1,12 +1,12 @@
 // adapted from https://github.com/ssundarraj/commander/blob/master/src/js/actions.js
-
 import browser from "~/browser";
+
 import { resetHistory } from "../last-used";
 import { inputSignal, parsedInput } from "../signals";
 
 export type Command = {
-  name: string;
-  category?: string;
+  title: string;
+  subtitle?: string;
   shortcut?: string;
   lastVisitTime?: number;
   keyword?: string;
@@ -17,85 +17,74 @@ const [, setInputValue] = inputSignal;
 
 const base: Command[] = [
   {
-    name: "New Tab",
-    category: "Command",
+    title: "New Tab",
     shortcut: "⌘ t",
     command: async function () {
       await browser.tabs.create({});
     },
   },
   {
-    name: "New Window",
+    title: "New Window",
     shortcut: "⌘ n",
-    category: "Command",
     command: async function () {
       await browser.windows.create({});
     },
   },
   {
-    name: "Open History Page",
-    category: "Command",
+    title: "Open History Page",
     shortcut: "⌘ y",
     command: async function () {
       await browser.tabs.create({ url: "chrome://history" });
     },
   },
   {
-    name: "Open Passwords Page",
-    category: "Command",
+    title: "Open Passwords Page",
     command: async function () {
       await browser.tabs.create({ url: "chrome://settings/passwords" });
     },
   },
   {
-    name: "Open Downloads",
-    category: "Command",
+    title: "Open Downloads",
     shortcut: "⌘⇧ d",
     command: async function () {
       await browser.tabs.create({ url: "chrome://downloads" });
     },
   },
   {
-    name: "Open Extensions",
-    category: "Command",
+    title: "Open Extensions",
     command: async function () {
       await browser.tabs.create({ url: "chrome://extensions" });
     },
   },
   {
-    name: "Open Extension Shortcuts",
-    category: "Command",
+    title: "Open Extension Shortcuts",
     command: async function () {
       await browser.tabs.create({ url: "chrome://extensions/shortcuts" });
     },
   },
   {
-    name: "Open Bookmark Manager",
-    category: "Command",
+    title: "Open Bookmark Manager",
     shortcut: "⌘⌥ b",
     command: async function () {
       await browser.tabs.create({ url: "chrome://bookmarks" });
     },
   },
   {
-    name: "Show/hide Bookmarks Bar",
-    category: "Command",
+    title: "Show/hide Bookmarks Bar",
     shortcut: "⌘⇧ b",
     command: async function () {
       setInputValue("Unsupported. Use [⌘⇧ b] instead.");
     },
   },
   {
-    name: "Open Settings",
-    category: "Command",
+    title: "Open Settings",
     shortcut: "⌘ ,",
     command: async function () {
       await browser.tabs.create({ url: "chrome://settings" });
     },
   },
   {
-    name: "Close Current Tab",
-    category: "Command",
+    title: "Close Current Tab",
     shortcut: "⌘ w",
     command: async function () {
       const windowId = browser.windows.WINDOW_ID_CURRENT;
@@ -107,8 +96,7 @@ const base: Command[] = [
     },
   },
   // {
-  //   name: "Terminate Current Tab",
-  //   category: "Command",
+  //   title: "Terminate Current Tab",
   //   command: async function () {
   //     const windowId = chrome.windows.WINDOW_ID_CURRENT;
   //     console.log(browser);
@@ -125,8 +113,7 @@ const base: Command[] = [
   //   },
   // },
   {
-    name: "Reload Tab",
-    category: "Command",
+    title: "Reload Tab",
     shortcut: "⌘ r",
     command: async function () {
       await browser.tabs.reload();
@@ -134,8 +121,7 @@ const base: Command[] = [
     },
   },
   {
-    name: "Reload All Tabs",
-    category: "Command",
+    title: "Reload All Tabs",
     command: async function () {
       const windowId = browser.windows.WINDOW_ID_CURRENT;
       const allTabs = await browser.tabs.query({ windowId });
@@ -146,8 +132,7 @@ const base: Command[] = [
     },
   },
   {
-    name: "Clear Cache and Reload Tab",
-    category: "Command",
+    title: "Clear Cache and Reload Tab",
     shortcut: "⌘⇧ r",
     command: async function () {
       await browser.tabs.reload(undefined, { bypassCache: true });
@@ -155,8 +140,7 @@ const base: Command[] = [
     },
   },
   {
-    name: "Toggle Pin",
-    category: "Command",
+    title: "Toggle Pin",
     command: async function () {
       const windowId = browser.windows.WINDOW_ID_CURRENT;
       const [currentTab] = await browser.tabs.query({
@@ -168,8 +152,7 @@ const base: Command[] = [
     },
   },
   {
-    name: "Duplicate Tab",
-    category: "Command",
+    title: "Duplicate Tab",
     command: async function () {
       const windowId = browser.windows.WINDOW_ID_CURRENT;
       const [currentTab] = await browser.tabs.query({
@@ -180,16 +163,14 @@ const base: Command[] = [
     },
   },
   {
-    name: "New Incognito Window",
-    category: "Command",
+    title: "New Incognito Window",
     shortcut: "⌘⇧ n",
     command: async function () {
       await browser.windows.create({ incognito: true });
     },
   },
   {
-    name: "Close Other Tabs",
-    category: "Command",
+    title: "Close Other Tabs",
     command: async function () {
       const windowId = browser.windows.WINDOW_ID_CURRENT;
       const otherTabs = await browser.tabs.query({
@@ -202,8 +183,7 @@ const base: Command[] = [
     },
   },
   {
-    name: "Close Tabs To Right",
-    category: "Command",
+    title: "Close Tabs To Right",
     command: async function () {
       const windowId = browser.windows.WINDOW_ID_CURRENT;
       const [currentTab] = await browser.tabs.query({
@@ -222,8 +202,7 @@ const base: Command[] = [
     },
   },
   {
-    name: "Close Tabs To Left",
-    category: "Command",
+    title: "Close Tabs To Left",
     command: async function () {
       const windowId = browser.windows.WINDOW_ID_CURRENT;
       const [currentTab] = await browser.tabs.query({
@@ -242,8 +221,7 @@ const base: Command[] = [
     },
   },
   {
-    name: "Mute/Unmute Tab",
-    category: "Command",
+    title: "Mute/Unmute Tab",
     command: async function () {
       const windowId = browser.windows.WINDOW_ID_CURRENT;
       const [currentTab] = await browser.tabs.query({
@@ -256,8 +234,7 @@ const base: Command[] = [
     },
   },
   {
-    name: "Move Tab To Start",
-    category: "Command",
+    title: "Move Tab To Start",
     command: async function () {
       const windowId = browser.windows.WINDOW_ID_CURRENT;
       const [currentTab] = await browser.tabs.query({
@@ -269,8 +246,7 @@ const base: Command[] = [
     },
   },
   {
-    name: "Move Tab To End",
-    category: "Command",
+    title: "Move Tab To End",
     command: async function () {
       const windowId = browser.windows.WINDOW_ID_CURRENT;
       const [currentTab] = await browser.tabs.query({
@@ -282,8 +258,7 @@ const base: Command[] = [
     },
   },
   {
-    name: "Move Tab Left",
-    category: "Command",
+    title: "Move Tab Left",
     command: async function () {
       const windowId = browser.windows.WINDOW_ID_CURRENT;
       const [currentTab] = await browser.tabs.query({
@@ -297,8 +272,7 @@ const base: Command[] = [
     },
   },
   {
-    name: "Move Tab Right",
-    category: "Command",
+    title: "Move Tab Right",
     command: async function () {
       const windowId = browser.windows.WINDOW_ID_CURRENT;
       const [currentTab] = await browser.tabs.query({
@@ -312,16 +286,14 @@ const base: Command[] = [
     },
   },
   {
-    name: "Reopen/Unclose Tab",
-    category: "Command",
+    title: "Reopen/Unclose Tab",
     shortcut: "⌘⇧ t",
     command: async function () {
       return await browser.sessions.restore();
     },
   },
   {
-    name: "Deattach Tab (Move to New Window)",
-    category: "Command",
+    title: "Deattach Tab (Move to New Window)",
     command: async function () {
       const [tab] = await browser.tabs.query({
         currentWindow: true,
@@ -331,8 +303,7 @@ const base: Command[] = [
     },
   },
   {
-    name: "Reattach Tab (Move Tab to Previous Window)",
-    category: "Command",
+    title: "Reattach Tab (Move Tab to Previous Window)",
     command: async function () {
       const [currentTab] = await browser.tabs.query({
         currentWindow: true,
@@ -357,8 +328,7 @@ const base: Command[] = [
     },
   },
   {
-    name: "Toggle full screen",
-    category: "Command",
+    title: "Toggle full screen",
     shortcut: "⌃⌘ f",
     command: async function () {
       const currWindow = await browser.windows.getCurrent();
@@ -370,8 +340,7 @@ const base: Command[] = [
     },
   },
   {
-    name: "Reset command history",
-    category: "Command",
+    title: "Reset command history",
     command: async function () {
       setTimeout(() => {
         // otherwise this command will be stored
@@ -384,18 +353,15 @@ const base: Command[] = [
 
 if (process.env.NODE_ENV !== "production") {
   base.push({
-    name: "Throw error",
-    category: "Dev",
+    title: "Throw error",
     command: async function () {
       throw new Error("on purpose");
     },
   });
 }
 
-function useCommandSuggestions() {
+export default function useCommandSuggestions(): Command[] {
   const { isCommand } = parsedInput();
   if (isCommand) return [];
   return base;
 }
-
-export default useCommandSuggestions;

@@ -1,9 +1,10 @@
-const KEYWORD = "h";
-
 import browser from "~/browser";
+
 import { createLazyResource, matchCommand, setInput } from "../signals";
 import { Command } from "./commandsSuggestions";
 import niceUrl from "./niceUrl";
+
+const KEYWORD = "h";
 
 export function isDefined<T>(a: T | null): a is T {
   return Boolean(a);
@@ -27,24 +28,23 @@ const commands = createLazyResource<Command[]>([], async (setVal) => {
         endTime,
         maxResults: 1000,
       }); // fetch all
-      const more = history
+      const more: Command[] = history
         .map(({ url, title, lastVisitTime }) => {
           if (!url) return null;
           return {
-            name: `${title || "Untitled"}\n${niceUrl(url)}`,
-            category: "History",
+            title: title || "Untitled",
+            subtitle: niceUrl(url),
             // keyword: url.slice(0, 100),
             lastVisitTime,
             icon: url,
             command: async function () {
               await browser.tabs.create({ url });
             },
-          } satisfies Command;
+          };
         })
         .filter(isDefined);
       list = [...list, ...more];
       setVal(list);
-      console.log({ startTime, endTime, l: list.length });
       endTime = startTime;
       done = history.length === 0 || list.length > MAX;
       await sleep(10);
@@ -53,10 +53,9 @@ const commands = createLazyResource<Command[]>([], async (setVal) => {
   return list;
 });
 
-const base = [
+const base: Command[] = [
   {
-    name: "Search History",
-    category: "Search",
+    title: "Search History",
     icon: "chrome://history/",
     command: async function () {
       setInput(KEYWORD + ">");
@@ -64,7 +63,7 @@ const base = [
     keyword: KEYWORD + ">",
   },
 ];
-export function historySuggestions() {
+export default function historySuggestions(): Command[] {
   const { isMatch, isCommand } = matchCommand(KEYWORD);
   if (isMatch) return commands();
   if (isCommand) return [];

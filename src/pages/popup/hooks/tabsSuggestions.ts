@@ -6,14 +6,14 @@ import niceUrl from "./niceUrl";
 
 const KEYWORD = "t";
 
-const commands = createLazyResource([], async () => {
+const commands = createLazyResource<Command[]>([], async () => {
   const allTabs = await browser.tabs.query({});
   return allTabs.map(({ title, url, id, windowId }) => {
     url ||= "";
     return {
-      name: `${title}\n${niceUrl(url)}`,
+      title: title || "Untitled",
+      subtitle: niceUrl(url),
       icon: url,
-      category: "Tab",
       command: () => {
         browser.tabs.update(id, { highlighted: true });
         browser.windows.update(windowId!, { focused: true });
@@ -23,10 +23,9 @@ const commands = createLazyResource([], async () => {
   });
 });
 
-const base = [
+const base: Command[] = [
   {
-    name: "Search Tabs",
-    category: "Search",
+    title: "Search Tabs",
     command: async function () {
       setInput(KEYWORD + ">");
     },
@@ -35,7 +34,7 @@ const base = [
   },
 ];
 
-export function switchTabSuggestions() {
+export default function switchTabSuggestions(): Command[] {
   const { isMatch, isCommand } = matchCommand(KEYWORD);
   if (isMatch) return commands();
   if (isCommand) return [];

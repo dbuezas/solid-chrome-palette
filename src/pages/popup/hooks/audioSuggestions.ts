@@ -1,13 +1,13 @@
 import browser from "~/browser";
+
 import { createLazyResource, parsedInput } from "../signals";
 import { Command } from "./commandsSuggestions";
 
 const commands = createLazyResource([], async () => {
   const allTabs = await browser.tabs.query({ audible: true });
   const actions: Command[] = allTabs.map(({ title, url, id, windowId }) => ({
-    name: `Sound/Audio tab: ${title}`,
+    title: `Sound/Audio tab: ${title}`,
     icon: "chrome://favicon/" + url,
-    category: "Tab",
     command: () => {
       browser.tabs.update(id, { highlighted: true });
       browser.windows.update(windowId!, { focused: true });
@@ -16,8 +16,7 @@ const commands = createLazyResource([], async () => {
   }));
   if (actions.length === 0) {
     actions.push({
-      name: `Sound/Audio tab: [none]`,
-      category: "Tab",
+      title: `Sound/Audio tab: [none]`,
       command: () => {
         window.close();
       },
@@ -26,7 +25,7 @@ const commands = createLazyResource([], async () => {
   return actions;
 });
 
-export function audibleTabSuggestions() {
+export default function audibleTabSuggestions(): Command[] {
   const { isCommand } = parsedInput();
   if (isCommand) return [];
   return commands();

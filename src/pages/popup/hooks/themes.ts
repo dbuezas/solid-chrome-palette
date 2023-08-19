@@ -1,6 +1,7 @@
 import { createEffect, createMemo, createSignal } from "solid-js";
 
 import { createStoredSignal, matchCommand, setInput } from "../signals";
+import { Command } from "./commandsSuggestions";
 
 const KEYWORD = "theme";
 
@@ -31,19 +32,18 @@ createEffect(() => {
   document.body.setAttribute("theme", theme());
 });
 
-const commands = () =>
+const commands = (): Command[] =>
   THEMES.map((aTheme) => ({
-    name: `${aTheme} ${themeConfig() == aTheme ? "\nSelected" : ""}`,
-    category: "Theme",
+    title: aTheme,
+    subtitle: themeConfig() == aTheme ? "\nSelected" : "",
     command: async function () {
       setThemeConfig(aTheme);
     },
   }));
 
-const base = [
+const base: Command[] = [
   {
-    name: "Chrome Palette Themes",
-    category: "Theme",
+    title: "Chrome Palette Themes",
     command: async function () {
       setInput(KEYWORD + ">");
     },
@@ -51,7 +51,7 @@ const base = [
   },
 ];
 
-export function themeSuggestions() {
+export default function themeSuggestions(): Command[] {
   const { isMatch, isCommand } = matchCommand(KEYWORD);
   if (isMatch) return commands();
   if (isCommand) return [];

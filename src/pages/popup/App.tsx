@@ -9,14 +9,14 @@ import browser from "~/browser";
 
 import Entry from "./Entry";
 import Shortcut from "./Shortcut";
-import { audibleTabSuggestions } from "./hooks/audioSuggestions";
-import { bookmarkSuggestions } from "./hooks/bookmarkSuggestions";
-import { bookmarkThisSuggestions } from "./hooks/bookmarkThisSuggestions";
+import audibleTabSuggestions from "./hooks/audioSuggestions";
+import bookmarkSuggestions from "./hooks/bookmarkSuggestions";
+import bookmarkThisSuggestions from "./hooks/bookmarkThisSuggestions";
 import commandSuggestions, { Command } from "./hooks/commandsSuggestions";
-import { historySuggestions } from "./hooks/historySuggestions";
-import { switchTabSuggestions } from "./hooks/tabsSuggestions";
-import { themeSuggestions } from "./hooks/themes";
-import { websitesSuggestions } from "./hooks/websitesSuggestions";
+import historySuggestions from "./hooks/historySuggestions";
+import switchTabSuggestions from "./hooks/tabsSuggestions";
+import themeSuggestions from "./hooks/themes";
+import websitesSuggestions from "./hooks/websitesSuggestions";
 import { sortByUsed, storeLastUsed } from "./last-used";
 import { createLazyResource, inputSignal, parsedInput } from "./signals";
 
@@ -28,7 +28,7 @@ const shortcut = createLazyResource("unset", async () => {
 });
 
 const [inputValue, setInputValue] = inputSignal;
-let last;
+
 const allCommands = createMemo(() => {
   let commands: Command[] = [
     ...commandSuggestions(),
@@ -51,7 +51,7 @@ const matches = createMemo(() => {
     threshold: -10000, // don't return bad results
     limit: scrollIndex(), // Don't return more results than this (lower is faster)
     all: true, // If true, returns all results for an empty search
-    key: "name", // For when targets are objects (see its example usage)
+    keys: ["title", "subtitle"], // For when targets are objects (see its example usage)
     // keys: null, // For when targets are objects (see its example usage)
     // scoreFn: null, // For use with `keys` (see its example usage)
   });
@@ -120,7 +120,7 @@ const App = () => {
             return (
               <Entry
                 isSelected={isSelected()}
-                keyResult={matches()[i()]}
+                keyResults={matches()[i()]}
                 setSelected={() => setSelectedI(i())}
                 command={command}
               />

@@ -11,7 +11,6 @@ import { parsedInput } from "~/signals";
 
 import Shortcut from "./Shortcut";
 
-const delimiter = String.fromCharCode(0);
 function faviconURL(u: string) {
   const url = new URL(browser.runtime.getURL("/_favicon/"));
   url.searchParams.set("pageUrl", u);
@@ -23,21 +22,16 @@ export default function Entry(props: {
   isSelected: boolean;
   setSelected: () => void;
   command: Command;
-  keyResult: Fuzzysort.KeyResult<Command>;
+  keyResults: Fuzzysort.KeysResult<Command>;
 }) {
-  const entry = createMemo(() => {
-    const text = !parsedInput().query
-      ? props.command.name
-      : fuzzysort.highlight(props.keyResult, delimiter, delimiter) ||
-        props.command.name;
-    const i = text.indexOf("\n");
-    const itemText = i === -1 ? text : text.slice(0, i);
-    const subitemText = i === -1 ? "" : text.slice(i + 1);
-    return { itemText, subitemText };
+  const subtitle = createMemo(() => {
+    if (!parsedInput().query) return props.command.subtitle || "";
+    return (
+      fuzzysort.highlight(props.keyResults[1], (t) => <b>{t}</b>) ||
+      props.command.subtitle ||
+      ""
+    );
   });
-  const itemText = createMemo(() => entry().itemText);
-  const subitemText = createMemo(() => entry().subitemText);
-  const hasSubitem = createMemo(() => !!subitemText());
   return (
     <li
       class="Entry"
@@ -59,7 +53,7 @@ export default function Entry(props: {
           <img
             classList={{
               img: true,
-              img_big: hasSubitem(),
+              img_big: !!subtitle(),
             }}
             src={faviconURL(icon())}
             alt=""
@@ -68,15 +62,17 @@ export default function Entry(props: {
       </Show>
 
       <div class="text">
-        <div class="item">
-          {itemText()
-            .split(delimiter)
-            .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
+        <div class="title">
+          <Show when={parsedInput().query} fallback={props.command.title}>
+            {fuzzysort.highlight(props.keyResults[0], (t) => <b>{t}</b>) ||
+              props.command.title}
+          </Show>
         </div>
-        <div class="subitem">
-          {subitemText()
-            .split(delimiter)
-            .map((t, i) => (i % 2 ? <b>{t}</b> : t))}
+        <div class="subtitle">
+          <Show when={parsedInput().query} fallback={props.command.subtitle}>
+            {fuzzysort.highlight(props.keyResults[1], (t) => <b>{t}</b>) ||
+              props.command.subtitle}
+          </Show>
           <Show when={props.command.lastVisitTime}>
             {(time) => (
               <span class="time_ago">{formatDistanceToNow(time())} ago</span>

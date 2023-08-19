@@ -1,8 +1,9 @@
-const KEYWORD = "bt";
-import { formatDistanceToNow } from "date-fns";
 import browser from "~/browser";
+
 import { createLazyResource, matchCommand, setInput } from "../signals";
 import { Command } from "./commandsSuggestions";
+
+const KEYWORD = "bt";
 
 const traverse = (
   nodes: browser.Bookmarks.BookmarkTreeNode[],
@@ -13,13 +14,9 @@ const traverse = (
     const list: Command[] = [];
     if (!url && path !== "") {
       list.push({
-        name: path,
+        title: path,
         icon: "chrome://favicon/",
-        category: "Add Bookmark",
-        timeAgo:
-          dateAdded !== 0
-            ? undefined
-            : formatDistanceToNow(new Date(dateAdded || 0)),
+        lastVisitTime: dateAdded,
         command: async function () {
           const [tab] = await browser.tabs.query({
             currentWindow: true,
@@ -42,10 +39,9 @@ const traverse = (
   });
 };
 
-const base = [
+const base: Command[] = [
   {
-    name: "Bookmark this tab",
-    category: "Add Bookmark",
+    title: "Bookmark this tab",
     command: async function () {
       setInput(KEYWORD + ">");
     },
@@ -58,7 +54,7 @@ const commands = createLazyResource([], async () => {
   return traverse(root);
 });
 
-export function bookmarkThisSuggestions() {
+export default function bookmarkThisSuggestions(): Command[] {
   const { isMatch, isCommand } = matchCommand(KEYWORD);
   if (isMatch) return commands();
   if (isCommand) return [];

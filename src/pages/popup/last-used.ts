@@ -7,15 +7,15 @@ export function resetHistory() {
   localStorage.lastUsed = JSON.stringify(store);
 }
 export function storeLastUsed(command: Command) {
-  store.unshift(command.name);
+  store.unshift(command.title);
   store = [...new Set(store)];
   store = store.slice(0, 50);
   localStorage.lastUsed = JSON.stringify(store);
 }
 export function sortByUsed(commands: Command[]) {
   commands.sort((a, b) => {
-    const a_idx = store.indexOf(a.name);
-    const b_idx = store.indexOf(b.name);
+    const a_idx = store.indexOf(a.title);
+    const b_idx = store.indexOf(b.title);
     const a_idx2 = commands.indexOf(a);
     const b_idx2 = commands.indexOf(b);
     if (a_idx === -1 && b_idx === -1) return a_idx2 - b_idx2;

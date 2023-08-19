@@ -1,15 +1,15 @@
-const KEYWORD = "b";
-
-import { formatDistanceToNow } from "date-fns";
 import browser from "~/browser";
+
 import { createLazyResource, matchCommand, setInput } from "../signals";
 import { Command } from "./commandsSuggestions";
 import niceUrl from "./niceUrl";
 
+const KEYWORD = "b";
+
 const traverse = (
   nodes: browser.Bookmarks.BookmarkTreeNode[],
   breadcrumb = ""
-): (Command & { dateAdded: number })[] => {
+): Command[] => {
   return nodes.flatMap(({ children, url, title, dateAdded }) => {
     const path = breadcrumb ? breadcrumb + "/" + title : title;
     if (children) {
@@ -17,13 +17,10 @@ const traverse = (
     }
     url ||= "";
     return {
-      name: `${title} > ${breadcrumb}\n${niceUrl(url)}`,
+      title: `${title} > ${breadcrumb}`,
+      subtitle: niceUrl(url),
       icon: "chrome://favicon/" + url,
-      category: "Bookmark",
-      dateAdded: dateAdded || 0,
-      timeAgo: dateAdded
-        ? formatDistanceToNow(new Date(dateAdded || 0))
-        : undefined,
+      lastVisitTime: dateAdded,
       command: async function () {
         await browser.tabs.create({ url });
       },
@@ -37,17 +34,16 @@ const commands = createLazyResource([], async () => {
   return traverse(root);
 });
 
-const base = [
+const base: Command[] = [
   {
-    name: "Bookmarked Tabs",
-    category: "Search",
+    title: "Bookmarked Tabs",
     command: async function () {
       setInput(KEYWORD + ">");
     },
     keyword: KEYWORD + ">",
   },
 ];
-export function bookmarkSuggestions() {
+export default function bookmarkSuggestions(): Command[] {
   const { isMatch, isCommand } = matchCommand(KEYWORD);
   if (isMatch) return commands();
   if (isCommand) return [];

@@ -1,57 +1,57 @@
 import browser from "~/browser";
+
 import { matchCommand, parsedInput, setInput } from "../signals";
+import { Command } from "./commandsSuggestions";
 
 type Template = {
-  name: string;
+  title: string;
   url: (query: string) => string;
   icon: string;
   keyword: string;
 };
 const templates: Template[] = [
   {
-    name: "Google Drive",
+    title: "Google Drive",
     url: (query) => `https://drive.google.com/drive/search?q=${query}`,
     icon: "https://drive.google.com",
     keyword: "gd",
   },
   {
-    name: "Youtube",
+    title: "Youtube",
     url: (query) => `https://www.youtube.com/results?search_query=${query}`,
     icon: "https://www.youtube.com",
     keyword: "y",
   },
   {
-    name: "Google",
+    title: "Google",
     url: (query) => `https://www.google.com/search?q=${query}`,
     icon: "https://www.google.com",
     keyword: "g",
   },
   {
-    name: "Wikipedia",
+    title: "Wikipedia",
     url: (query) => `https://en.wikipedia.org/w/index.php?search=${query}`,
     icon: "https://en.wikipedia.org",
     keyword: "w",
   },
 ];
 
-const base = templates.map((template) => ({
-  name: `Search ${template.name}`,
+const base: Command[] = templates.map((template) => ({
+  title: `Search ${template.title}`,
   icon: template.icon,
-  category: "Search",
   command: async function () {
     setInput(template.keyword + ">");
   },
   keyword: template.keyword + ">",
 }));
 
-export function websitesSuggestions() {
+export default function websitesSuggestions(): Command[] {
   for (const template of templates) {
     const { isMatch, query } = matchCommand(template.keyword);
     if (isMatch)
       return [
         {
-          name: `Search ${template.name}: ${query}`,
-          category: "Search",
+          title: `Search ${template.title}: ${query}`,
           command: async function () {
             await browser.tabs.create({
               url: template.url(query),
