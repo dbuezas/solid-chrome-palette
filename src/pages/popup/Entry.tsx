@@ -7,6 +7,7 @@ import { Show, createEffect, createMemo } from "solid-js";
 
 import browser from "~/util/browser";
 
+import Keyword from "./Keyword";
 import Shortcut from "./Shortcut";
 import { Command } from "./commands/general";
 import { parsedInput } from "./util/signals";
@@ -20,7 +21,6 @@ function faviconURL(u: string) {
 
 export default function Entry(props: {
   isSelected: boolean;
-  setSelected: () => void;
   command: Command;
   keyResults: Fuzzysort.KeysResult<Command>;
 }) {
@@ -38,7 +38,6 @@ export default function Entry(props: {
       classList={{
         selected: props.isSelected,
       }}
-      onMouseMove={props.setSelected}
       onclick={() => props.command.command()}
       ref={(el) => {
         createEffect(() => {
@@ -81,6 +80,7 @@ export default function Entry(props: {
         </div>
       </div>
       <Shortcut keys={props.command.shortcut} />
+      <Keyword keyword={props.command.keyword} />
     </li>
   );
 }

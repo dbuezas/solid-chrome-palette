@@ -10,7 +10,9 @@
   },
   "scripts": {
     "serve": "vite dev --open 'http://127.0.0.1:5173/src/pages/popup/index.html'",
+    "serve:prod": "npm run start:prod & npx serve dist & npx --yes open-cli http://localhost:3000/src/pages/popup/ -- 'google chrome' & wait",
     "start": "vite build --watch --minify false",
+    "start:prod": "vite build --watch",
     "build": "vite build",
     "lint": "eslint . --fix -c .eslintrc --ext js,ts --ignore-pattern='!.*'",
     "dev:nodemon": "nodemon",

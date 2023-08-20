@@ -1,4 +1,3 @@
-// render inside top level Solid component
 import "./Shortcut.scss";
 
 import { Show } from "solid-js";

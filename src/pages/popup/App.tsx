@@ -2,7 +2,13 @@ import "./App.scss";
 
 import fuzzysort from "fuzzysort";
 import InfiniteScroll from "solid-infinite-scroll";
-import { createEffect, createMemo, createSignal } from "solid-js";
+import {
+  Show,
+  createEffect,
+  createMemo,
+  createResource,
+  createSignal,
+} from "solid-js";
 import tinykeys from "tinykeys";
 
 import Entry from "./Entry";
@@ -19,11 +25,11 @@ import browser from "./util/browser";
 import { sortByUsed, storeLastUsed } from "./util/last-used";
 import { createLazyResource, inputSignal, parsedInput } from "./util/signals";
 
-const shortcut = createLazyResource("unset", async () => {
+const shortcut = createLazyResource("?", async () => {
   const commands = await browser.commands.getAll();
   const mainCommand = commands.find(({ name }) => name === "_execute_action");
   if (mainCommand?.shortcut) return mainCommand.shortcut;
-  return "unset";
+  return "?";
 });
 
 const [inputValue, setInputValue] = inputSignal;
@@ -88,55 +94,70 @@ tinykeys(window, {
   },
 });
 
+const PinWarning = () => {
+  const [userSettings] = createResource(() => browser.action.getUserSettings());
+  const isNotPinned = createMemo(
+    () => userSettings() && userSettings()?.isOnToolbar === false
+  );
+  return (
+    <Show when={isNotPinned()}>
+      <div style={{ color: "red", padding: "10px" }}>
+        Pin the extension to the toolbar for faster load
+      </div>
+    </Show>
+  );
+};
 const App = () => {
   createEffect(() => {
     inputValue();
     setScrollIndex(50);
   });
   return (
-    <div class="App">
-      <div class="input_wrap">
-        <input
-          class="input"
-          autofocus
-          placeholder="Type to search..."
-          value={inputValue()}
-          onBlur={(e) => {
-            e.target.focus();
-          }}
-          onInput={(e) => {
-            setInputValue(e.target.value);
-            setSelectedI(0);
-          }}
-        />
-        <Shortcut
-          onClick={() =>
-            browser.tabs.create({ url: "chrome://extensions/shortcuts" })
-          }
-          keys={shortcut()}
-        />
+    <>
+      <div class="App">
+        <div class="input_wrap">
+          <input
+            class="input"
+            autofocus
+            placeholder="Type to search..."
+            value={inputValue()}
+            onBlur={(e) => {
+              e.target.focus();
+            }}
+            onInput={(e) => {
+              setInputValue(e.target.value);
+              setSelectedI(0);
+            }}
+          />
+          <Shortcut
+            onClick={() =>
+              browser.tabs.create({ url: "chrome://extensions/shortcuts" })
+            }
+            keys={shortcut()}
+          />
+        </div>
+        <ul class="list">
+          <InfiniteScroll
+            loadingMessage={<></>}
+            each={filteredCommands()}
+            hasMore={true}
+            next={() => setScrollIndex(scrollIndex() * 2)}
+          >
+            {(command, i) => {
+              const isSelected = createMemo(() => i() === selectedI());
+              return (
+                <Entry
+                  isSelected={isSelected()}
+                  keyResults={matches()[i()]}
+                  command={command}
+                />
+              );
+            }}
+          </InfiniteScroll>
+        </ul>
       </div>
-      <ul class="list">
-        <InfiniteScroll
-          loadingMessage={<></>}
-          each={filteredCommands()}
-          hasMore={true}
-          next={() => setScrollIndex(scrollIndex() + 50)}
-        >
-          {(command, i) => {
-            const isSelected = createMemo(() => i() === selectedI());
-            return (
-              <Entry
-                isSelected={isSelected()}
-                keyResults={matches()[i()]}
-                setSelected={() => setSelectedI(i())}
-                command={command}
-              />
-            );
-          }}
-        </InfiniteScroll>
-      </ul>
-    </div>
+      {/* <PinWarning /> */}
+    </>
   );
 };
 

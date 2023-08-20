@@ -1,6 +1,6 @@
 import { crx } from "@crxjs/vite-plugin";
 import { resolve } from "path";
-import devtools from "solid-devtools/vite";
+// import devtools from "solid-devtools/vite";
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import WindiCSS from "vite-plugin-windicss";
@@ -18,10 +18,10 @@ const isDev = process.env.__DEV__ === "true";
 
 export default defineConfig({
   plugins: [
-    devtools({
-      /* features options - all disabled by default */
-      autoname: true, // e.g. enable autoname
-    }),
+    // devtools({
+    //   /* features options - all disabled by default */
+    //   autoname: true, // e.g. enable autoname
+    // }),
     solidPlugin(),
     crx({ manifest }),
     WindiCSS(),
