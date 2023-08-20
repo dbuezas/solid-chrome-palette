@@ -1,5 +1,3 @@
-import browser from "webextension-polyfill";
-
 import niceUrl from "~/util/nice-url";
 import { createLazyResource, matchCommand, setInput } from "~/util/signals";
 
@@ -23,7 +21,7 @@ const commands = createLazyResource<Command[]>([], async (setVal) => {
     const MAX = Number.POSITIVE_INFINITY;
     while (!done) {
       const startTime = endTime - ONE_DAY;
-      const history = await browser.history.search({
+      const history = await chrome.history.search({
         text: "",
         startTime,
         endTime,
@@ -39,7 +37,7 @@ const commands = createLazyResource<Command[]>([], async (setVal) => {
             lastVisitTime,
             icon: url,
             command: async function () {
-              await browser.tabs.create({ url });
+              await chrome.tabs.create({ url });
             },
           };
         })

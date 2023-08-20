@@ -1,5 +1,3 @@
-import browser from "webextension-polyfill";
-
 import { createLazyResource, matchCommand, setInput } from "~/util/signals";
 
 import { Command } from "./general";
@@ -7,7 +5,7 @@ import { Command } from "./general";
 const KEYWORD = "bt";
 
 const traverse = (
-  nodes: browser.Bookmarks.BookmarkTreeNode[],
+  nodes: chrome.bookmarks.BookmarkTreeNode[],
   breadcrumb = ""
 ): Command[] => {
   return nodes.flatMap(({ id, children, url, title, dateAdded }) => {
@@ -19,11 +17,11 @@ const traverse = (
         icon: "chrome://favicon/",
         lastVisitTime: dateAdded,
         command: async function () {
-          const [tab] = await browser.tabs.query({
+          const [tab] = await chrome.tabs.query({
             currentWindow: true,
             active: true,
           });
-          await browser.bookmarks.create({
+          await chrome.bookmarks.create({
             index: 0,
             url: tab.url,
             title: tab.title,
@@ -51,7 +49,7 @@ const base: Command[] = [
 ];
 
 const commands = createLazyResource([], async () => {
-  const root = await browser.bookmarks.getTree();
+  const root = await chrome.bookmarks.getTree();
   return traverse(root);
 });
 

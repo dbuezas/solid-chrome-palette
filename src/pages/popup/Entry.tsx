@@ -1,10 +1,9 @@
 // render inside top level Solid component
 import "./Entry.scss";
 
-import { formatDistanceToNow } from "date-fns";
 import fuzzysort from "fuzzysort";
 import { Show, createEffect, createMemo } from "solid-js";
-import browser from "webextension-polyfill";
+import twas from "twas";
 
 import Keyword from "./Keyword";
 import Shortcut from "./Shortcut";
@@ -12,7 +11,7 @@ import { Command } from "./commands/general";
 import { parsedInput } from "./util/signals";
 
 function faviconURL(u: string) {
-  const url = new URL(browser.runtime.getURL("/_favicon/"));
+  const url = new URL(chrome.runtime.getURL("/_favicon/"));
   url.searchParams.set("pageUrl", u);
   url.searchParams.set("size", "32");
   return url.toString();
@@ -72,9 +71,7 @@ export default function Entry(props: {
               props.command.subtitle}
           </Show>
           <Show when={props.command.lastVisitTime}>
-            {(time) => (
-              <span class="time_ago">{formatDistanceToNow(time())} ago</span>
-            )}
+            {(time) => <span class="time_ago">{twas(time())} ago</span>}
           </Show>
         </div>
       </div>

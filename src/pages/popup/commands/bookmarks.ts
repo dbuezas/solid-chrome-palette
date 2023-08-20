@@ -1,5 +1,3 @@
-import browser from "webextension-polyfill";
-
 import niceUrl from "~/util/nice-url";
 import { createLazyResource, matchCommand, setInput } from "~/util/signals";
 
@@ -8,7 +6,7 @@ import { Command } from "./general";
 const KEYWORD = "b";
 
 const traverse = (
-  nodes: browser.Bookmarks.BookmarkTreeNode[],
+  nodes: chrome.bookmarks.BookmarkTreeNode[],
   breadcrumb = ""
 ): Command[] => {
   return nodes.flatMap(({ children, url, title, dateAdded }) => {
@@ -23,7 +21,7 @@ const traverse = (
       icon: "chrome://favicon/" + url,
       lastVisitTime: dateAdded,
       command: async function () {
-        await browser.tabs.create({ url });
+        await chrome.tabs.create({ url });
       },
     };
   });
@@ -31,7 +29,7 @@ const traverse = (
 };
 const commands = createLazyResource([], async () => {
   ("fetching bookmarks");
-  const root = await browser.bookmarks.getTree();
+  const root = await chrome.bookmarks.getTree();
   return traverse(root);
 });
 

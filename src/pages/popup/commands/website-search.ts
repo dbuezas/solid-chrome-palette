@@ -1,5 +1,3 @@
-import browser from "webextension-polyfill";
-
 import { matchCommand, parsedInput, setInput } from "~/util/signals";
 
 import { Command } from "./general";
@@ -54,7 +52,7 @@ export default function websitesSuggestions(): Command[] {
         {
           title: `Search ${template.title}: ${query}`,
           command: async function () {
-            await browser.tabs.create({
+            await chrome.tabs.create({
               url: template.url(query),
             });
           },

@@ -1,8 +1,8 @@
 // adapted from https://github.com/ssundarraj/commander/blob/master/src/js/actions.js
-import browser from "webextension-polyfill";
-
 import { resetHistory } from "~/util/last-used";
 import { inputSignal, parsedInput } from "~/util/signals";
+
+import { isTruthy } from "../util/isTruthy";
 
 export type Command = {
   title: string;
@@ -16,8 +16,8 @@ export type Command = {
 const [, setInputValue] = inputSignal;
 
 const getActiveTab = async () => {
-  const windowId = browser.windows.WINDOW_ID_CURRENT;
-  const [currentTab] = await browser.tabs.query({
+  const windowId = chrome.windows.WINDOW_ID_CURRENT;
+  const [currentTab] = await chrome.tabs.query({
     active: true,
     windowId,
   });
@@ -28,53 +28,53 @@ const base: Command[] = [
     title: "New Tab",
     shortcut: "⌘ t",
     command: async function () {
-      await browser.tabs.create({});
+      await chrome.tabs.create({});
     },
   },
   {
     title: "New Window",
     shortcut: "⌘ n",
     command: async function () {
-      await browser.windows.create({});
+      await chrome.windows.create({});
     },
   },
   {
     title: "Open History Page",
     shortcut: "⌘ y",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://history" });
+      await chrome.tabs.create({ url: "chrome://history" });
     },
   },
   {
     title: "Open Passwords Page",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/passwords" });
+      await chrome.tabs.create({ url: "chrome://settings/passwords" });
     },
   },
   {
     title: "Open Downloads",
     shortcut: "⌘⇧ d",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://downloads" });
+      await chrome.tabs.create({ url: "chrome://downloads" });
     },
   },
   {
     title: "Open Extensions",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://extensions" });
+      await chrome.tabs.create({ url: "chrome://extensions" });
     },
   },
   {
     title: "Open Extension Shortcuts",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://extensions/shortcuts" });
+      await chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
     },
   },
   {
     title: "Open Bookmark Manager",
     shortcut: "⌘⌥ b",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://bookmarks" });
+      await chrome.tabs.create({ url: "chrome://bookmarks" });
     },
   },
   {
@@ -88,7 +88,7 @@ const base: Command[] = [
     title: "Open Settings",
     shortcut: "⌘ ,",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings" });
+      await chrome.tabs.create({ url: "chrome://settings" });
     },
   },
   {
@@ -96,41 +96,43 @@ const base: Command[] = [
     shortcut: "⌘ w",
     command: async function () {
       const currentTab = await getActiveTab();
-      await browser.tabs.remove(currentTab.id!);
+      await chrome.tabs.remove(currentTab.id!);
     },
   },
   // {
   //   title: "Terminate Current Tab",
   //   command: async function () {
   //     const windowId = chrome.windows.WINDOW_ID_CURRENT;
-  //     console.log(browser);
-  //     const [currentTab] = await browser.tabs.query({
+  //     console.log(chrome);
+  //     const [currentTab] = await chrome.tabs.query({
   //       active: true,
   //       windowId,
   //     });
   //     debugger;
-  //     const processId = await browser.processes.getProcessIdForTab(
+  //     const processId = await chrome.processes.getProcessIdForTab(
   //       currentTab.id!
   //     );
 
-  //     await browser.processes.terminate(processId);
+  //     await chrome.processes.terminate(processId);
   //   },
   // },
   {
     title: "Reload Tab",
     shortcut: "⌘ r",
     command: async function () {
-      await browser.tabs.reload();
+      await chrome.tabs.reload();
       window.close();
     },
   },
   {
     title: "Reload All Tabs",
     command: async function () {
-      const windowId = browser.windows.WINDOW_ID_CURRENT;
-      const allTabs = await browser.tabs.query({ windowId });
-      for (const tab of allTabs) {
-        await browser.tabs.reload(tab.id);
+      const windowId = chrome.windows.WINDOW_ID_CURRENT;
+      const allTabIds = (await chrome.tabs.query({ windowId }))
+        .map(({ id }) => id)
+        .filter(isTruthy);
+      for (const id of allTabIds) {
+        await chrome.tabs.reload(id);
       }
       window.close();
     },
@@ -139,7 +141,8 @@ const base: Command[] = [
     title: "Clear Cache and Reload Tab",
     shortcut: "⌘⇧ r",
     command: async function () {
-      await browser.tabs.reload(undefined, { bypassCache: true });
+      const tab = await getActiveTab();
+      await chrome.tabs.reload(tab.id!, { bypassCache: true });
       window.close();
     },
   },
@@ -147,7 +150,7 @@ const base: Command[] = [
     title: "Toggle Pin",
     command: async function () {
       const currentTab = await getActiveTab();
-      await browser.tabs.update({ pinned: !currentTab.pinned });
+      await chrome.tabs.update({ pinned: !currentTab.pinned });
       window.close();
     },
   },
@@ -155,42 +158,42 @@ const base: Command[] = [
     title: "Duplicate Tab",
     command: async function () {
       const currentTab = await getActiveTab();
-      await browser.tabs.duplicate(currentTab.id!);
+      await chrome.tabs.duplicate(currentTab.id!);
     },
   },
   {
     title: "New Incognito Window",
     shortcut: "⌘⇧ n",
     command: async function () {
-      await browser.windows.create({ incognito: true });
+      await chrome.windows.create({ incognito: true });
     },
   },
   {
     title: "Close Other Tabs",
     command: async function () {
-      const windowId = browser.windows.WINDOW_ID_CURRENT;
-      const otherTabs = await browser.tabs.query({
+      const windowId = chrome.windows.WINDOW_ID_CURRENT;
+      const otherTabs = await chrome.tabs.query({
         active: false,
         windowId,
       });
       const otherTabIds = otherTabs.map(({ id }) => id!);
-      await browser.tabs.remove(otherTabIds);
+      await chrome.tabs.remove(otherTabIds);
       window.close();
     },
   },
   {
     title: "Close Tabs To Right",
     command: async function () {
-      const windowId = browser.windows.WINDOW_ID_CURRENT;
+      const windowId = chrome.windows.WINDOW_ID_CURRENT;
       const currentTab = await getActiveTab();
-      const otherTabs = await browser.tabs.query({
+      const otherTabs = await chrome.tabs.query({
         active: false,
         windowId,
       });
       const otherTabIds = otherTabs
         .filter((tab) => tab.index > currentTab.index)
         .map(({ id }) => id!);
-      await browser.tabs.remove(otherTabIds);
+      await chrome.tabs.remove(otherTabIds);
       window.close();
     },
   },
@@ -198,15 +201,15 @@ const base: Command[] = [
     title: "Close Tabs To Left",
     command: async function () {
       const currentTab = await getActiveTab();
-      const windowId = browser.windows.WINDOW_ID_CURRENT;
-      const otherTabs = await browser.tabs.query({
+      const windowId = chrome.windows.WINDOW_ID_CURRENT;
+      const otherTabs = await chrome.tabs.query({
         active: false,
         windowId,
       });
       const otherTabIds = otherTabs
         .filter((tab) => tab.index < currentTab.index)
         .map(({ id }) => id!);
-      await browser.tabs.remove(otherTabIds);
+      await chrome.tabs.remove(otherTabIds);
       window.close();
     },
   },
@@ -215,7 +218,7 @@ const base: Command[] = [
     command: async function () {
       const currentTab = await getActiveTab();
       const isMuted = currentTab.mutedInfo!.muted;
-      await browser.tabs.update({ muted: !isMuted });
+      await chrome.tabs.update({ muted: !isMuted });
       window.close();
     },
   },
@@ -223,7 +226,7 @@ const base: Command[] = [
     title: "Move Tab To Start",
     command: async function () {
       const currentTab = await getActiveTab();
-      await browser.tabs.move(currentTab.id!, { index: 0 });
+      await chrome.tabs.move(currentTab.id!, { index: 0 });
       window.close();
     },
   },
@@ -231,7 +234,7 @@ const base: Command[] = [
     title: "Move Tab To End",
     command: async function () {
       const currentTab = await getActiveTab();
-      await browser.tabs.move(currentTab.id!, { index: -1 });
+      await chrome.tabs.move(currentTab.id!, { index: -1 });
       window.close();
     },
   },
@@ -239,7 +242,7 @@ const base: Command[] = [
     title: "Move Tab Left",
     command: async function () {
       const currentTab = await getActiveTab();
-      await browser.tabs.move(currentTab.id!, {
+      await chrome.tabs.move(currentTab.id!, {
         index: currentTab.index - 1,
       });
       window.close();
@@ -249,7 +252,7 @@ const base: Command[] = [
     title: "Move Tab Right",
     command: async function () {
       const currentTab = await getActiveTab();
-      await browser.tabs.move(currentTab.id!, {
+      await chrome.tabs.move(currentTab.id!, {
         index: currentTab.index + 1,
       });
       window.close();
@@ -259,51 +262,51 @@ const base: Command[] = [
     title: "Reopen/Unclose Tab",
     shortcut: "⌘⇧ t",
     command: async function () {
-      return await browser.sessions.restore();
+      return await chrome.sessions.restore();
     },
   },
   {
     title: "Deattach Tab (Move to New Window)",
     command: async function () {
-      const [tab] = await browser.tabs.query({
+      const [tab] = await chrome.tabs.query({
         currentWindow: true,
         active: true,
       });
-      await browser.windows.create({ tabId: tab.id });
+      await chrome.windows.create({ tabId: tab.id });
     },
   },
   {
     title: "Reattach Tab (Move Tab to Previous Window)",
     command: async function () {
-      const [currentTab] = await browser.tabs.query({
+      const [currentTab] = await chrome.tabs.query({
         currentWindow: true,
         active: true,
       });
-      const currentWindow = await browser.windows.getCurrent({
+      const currentWindow = await chrome.windows.getCurrent({
         // windowTypes: ["normal"],
       });
-      const allWindows = await browser.windows.getAll({
+      const allWindows = await chrome.windows.getAll({
         windowTypes: ["normal"],
       });
       const otherWindows = allWindows.filter(
         (win) => win.id !== currentWindow.id
       );
       const prevWindow = otherWindows[0];
-      await browser.windows.update(prevWindow.id!, { focused: true });
-      await browser.tabs.move(currentTab.id!, {
+      await chrome.windows.update(prevWindow.id!, { focused: true });
+      await chrome.tabs.move(currentTab.id!, {
         windowId: prevWindow.id,
         index: -1,
       });
-      await browser.tabs.update(currentTab.id!, { highlighted: true });
+      await chrome.tabs.update(currentTab.id!, { highlighted: true });
     },
   },
   {
     title: "Toggle full screen",
     shortcut: "⌃⌘ f",
     command: async function () {
-      const currWindow = await browser.windows.getCurrent();
+      const currWindow = await chrome.windows.getCurrent();
       const state = currWindow.state === "fullscreen" ? "normal" : "fullscreen";
-      browser.windows.update(currWindow.id!, {
+      chrome.windows.update(currWindow.id!, {
         state,
       });
       window.close();
@@ -313,133 +316,133 @@ const base: Command[] = [
     title: "Clear browsing data",
     shortcut: "⌘⇧ ⌫",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/clearBrowserData" });
+      await chrome.tabs.create({ url: "chrome://settings/clearBrowserData" });
     },
   },
   {
     title: "Open Chrome SignIn internals",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://signin-internals/" });
+      await chrome.tabs.create({ url: "chrome://signin-internals/" });
     },
   },
   {
     title: "Open Chrome Apps",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://apps/" });
+      await chrome.tabs.create({ url: "chrome://apps/" });
     },
   },
   {
     title: "Configure Chrome internal flags",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://flags/" });
+      await chrome.tabs.create({ url: "chrome://flags/" });
     },
   },
   {
     title: "Configure Third-party Cookies",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/cookies" });
+      await chrome.tabs.create({ url: "chrome://settings/cookies" });
     },
   },
   {
     title: "Configure Ad privacy",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/adPrivacy" });
+      await chrome.tabs.create({ url: "chrome://settings/adPrivacy" });
     },
   },
   {
     title: "Configure Sync and Google Services",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/syncSetup" });
+      await chrome.tabs.create({ url: "chrome://settings/syncSetup" });
     },
   },
   {
     title: "Configure Chrome Profile",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/manageProfile" });
+      await chrome.tabs.create({ url: "chrome://settings/manageProfile" });
     },
   },
   {
     title: "Import Bookmarks & Settings",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/importData" });
+      await chrome.tabs.create({ url: "chrome://settings/importData" });
     },
   },
   {
     title: "Configure Addresses",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/addresses" });
+      await chrome.tabs.create({ url: "chrome://settings/addresses" });
     },
   },
   {
     title: "Configure Autofill & Passwords",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/autofill" });
+      await chrome.tabs.create({ url: "chrome://settings/autofill" });
     },
   },
   {
     title: "Configure Payment Methods",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/payments" });
+      await chrome.tabs.create({ url: "chrome://settings/payments" });
     },
   },
   {
     title: "Configure Site Settings & Permissions",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/content" });
+      await chrome.tabs.create({ url: "chrome://settings/content" });
     },
   },
   {
     title: "Configure Security",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/security" });
+      await chrome.tabs.create({ url: "chrome://settings/security" });
     },
   },
   {
     title: "Configure Privacy and security",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/privacy" });
+      await chrome.tabs.create({ url: "chrome://settings/privacy" });
     },
   },
   {
     title: "Configure Search engine",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/defaultBrowser" });
+      await chrome.tabs.create({ url: "chrome://settings/defaultBrowser" });
     },
   },
   {
-    title: "Configure Default browser",
+    title: "Configure Default chrome",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/defaultBrowser" });
+      await chrome.tabs.create({ url: "chrome://settings/defaultBrowser" });
     },
   },
   {
     title: "Configure on Start-up",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/onStartup" });
+      await chrome.tabs.create({ url: "chrome://settings/onStartup" });
     },
   },
   {
     title: "Configure Languages",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/languages" });
+      await chrome.tabs.create({ url: "chrome://settings/languages" });
     },
   },
   {
     title: "Configure Accessibility",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/accessibility" });
+      await chrome.tabs.create({ url: "chrome://settings/accessibility" });
     },
   },
   {
     title: "Configure System & Proxy",
     command: async function () {
-      await browser.tabs.create({ url: "chrome://settings/system" });
+      await chrome.tabs.create({ url: "chrome://settings/system" });
     },
   },
   {
     title: "Reset chrome settings",
     command: async function () {
-      await browser.tabs.create({
+      await chrome.tabs.create({
         url: "chrome://settings/resetProfileSettings?origin=userclick",
       });
     },
@@ -447,7 +450,7 @@ const base: Command[] = [
   {
     title: "About chrome",
     command: async function () {
-      await browser.tabs.create({
+      await chrome.tabs.create({
         url: "chrome://settings/help",
       });
     },

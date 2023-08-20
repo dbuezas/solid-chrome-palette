@@ -1,5 +1,3 @@
-import browser from "webextension-polyfill";
-
 import { createLazyResource, parsedInput } from "~/util/signals";
 
 import { Command } from "./general";
@@ -13,13 +11,13 @@ const baseCommands = [
   },
 ];
 const commands = createLazyResource(baseCommands, async () => {
-  const allTabs = await browser.tabs.query({ audible: true });
+  const allTabs = await chrome.tabs.query({ audible: true });
   const actions: Command[] = allTabs.map(({ title, url, id, windowId }) => ({
     title: `Sound/Audio tab: ${title}`,
     icon: "chrome://favicon/" + url,
     command: () => {
-      browser.tabs.update(id, { highlighted: true });
-      browser.windows.update(windowId!, { focused: true });
+      chrome.tabs.update(id!, { highlighted: true });
+      chrome.windows.update(windowId!, { focused: true });
       window.close();
     },
   }));

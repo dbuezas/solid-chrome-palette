@@ -1,5 +1,3 @@
-import browser from "webextension-polyfill";
-
 import niceUrl from "~/util/nice-url";
 import { createLazyResource, matchCommand, setInput } from "~/util/signals";
 
@@ -8,7 +6,7 @@ import { Command } from "./general";
 const KEYWORD = "t";
 
 const commands = createLazyResource<Command[]>([], async () => {
-  const allTabs = await browser.tabs.query({});
+  const allTabs = await chrome.tabs.query({});
   return allTabs.map(({ title, url, id, windowId }) => {
     url ||= "";
     return {
@@ -16,8 +14,8 @@ const commands = createLazyResource<Command[]>([], async () => {
       subtitle: niceUrl(url),
       icon: url,
       command: () => {
-        browser.tabs.update(id, { highlighted: true });
-        browser.windows.update(windowId!, { focused: true });
+        chrome.tabs.update(id!, { highlighted: true });
+        chrome.windows.update(windowId!, { focused: true });
         window.close();
       },
     } satisfies Command;

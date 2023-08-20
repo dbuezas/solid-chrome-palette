@@ -10,7 +10,6 @@ import {
   createSignal,
 } from "solid-js";
 import { tinykeys } from "tinykeys";
-import browser from "webextension-polyfill";
 
 import Entry from "./Entry";
 import Shortcut from "./Shortcut";
@@ -27,7 +26,7 @@ import { createStoredSignal, inputSignal, parsedInput } from "./util/signals";
 
 const [shortcut, setShortcut] = createStoredSignal("_execute_action", "?");
 
-browser.commands.getAll().then((commands) => {
+chrome.commands.getAll().then((commands) => {
   const mainCommand = commands.find(({ name }) => name === "_execute_action");
   if (mainCommand?.shortcut) setShortcut(mainCommand.shortcut);
   else setShortcut("?");
@@ -98,7 +97,7 @@ tinykeys(window, {
 });
 
 const PinWarning = () => {
-  const [userSettings] = createResource(() => browser.action.getUserSettings());
+  const [userSettings] = createResource(() => chrome.action.getUserSettings());
   const isNotPinned = createMemo(
     () => userSettings() && userSettings()?.isOnToolbar === false
   );
@@ -134,7 +133,7 @@ const App = () => {
           />
           <Shortcut
             onClick={() =>
-              browser.tabs.create({ url: "chrome://extensions/shortcuts" })
+              chrome.tabs.create({ url: "chrome://extensions/shortcuts" })
             }
             keys={shortcut()}
           />
