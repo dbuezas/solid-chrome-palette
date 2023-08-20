@@ -1,4 +1,5 @@
-import browser from "~/util/browser";
+import browser from "webextension-polyfill";
+
 import { matchCommand, parsedInput, setInput } from "~/util/signals";
 
 import { Command } from "./general";

@@ -1,28 +1,43 @@
 body[theme="Light"] {
-  --input-border-color: #adadad;
   --app-background-color: #fefefe;
-  --entry-matched-text: #54a9f8;
+  --entry-hover-background-color: #ebebeb88;
+  --entry-matched-text: #0072dd;
   --entry-selected-background-color: #ebebeb;
   --entry-selected-border-color: #d6d6d6;
-  --entry-hover-background-color: #ebebeb88;
+  --entry-selected-text-color: #222;
+  --input-border-color: #adadad;
   --shortcut-background-color: #cde6ff;
   --shortcut-border-color: #9bb7e2;
   --shortcut-text-color: #455670;
   --text-color: #222;
+  --thumbBG: #a7a7a7;
 }
 
 body[theme="Dark"] {
   --app-background-color: #323232;
   --entry-hover-background-color: #7d7d7d44;
-  --entry-selected-background-color: #7d7d7d;
-  --entry-selected-text-color: #ffffff;
-  --entry-selected-border-color: #777;
   --entry-matched-text: #54a9f8;
+  --entry-selected-background-color: #7d7d7d;
+  --entry-selected-border-color: #a7a7a7;
+  --entry-selected-text-color: #ffffff;
+  --input-border-color: #adadad;
   --shortcut-background-color: #4b72ae;
   --shortcut-border-color: #6892d3;
   --shortcut-text-color: #eee;
   --text-color: #ccc;
+  --thumbBG: #a7a7a7;
 }
+.list::-webkit-scrollbar {
+  width: 8px;
+}
+.list {
+  scrollbar-color: var(--thumbBG);
+}
+.list::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: var(--thumbBG);
+}
+
 body[theme="Github"] {
   --app-background-color: #25292e;
   --entry-hover-background-color: #eee;

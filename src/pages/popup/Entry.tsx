@@ -4,8 +4,7 @@ import "./Entry.scss";
 import { formatDistanceToNow } from "date-fns";
 import fuzzysort from "fuzzysort";
 import { Show, createEffect, createMemo } from "solid-js";
-
-import browser from "~/util/browser";
+import browser from "webextension-polyfill";
 
 import Keyword from "./Keyword";
 import Shortcut from "./Shortcut";

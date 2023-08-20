@@ -1,4 +1,5 @@
-import browser from "~/util/browser";
+import browser from "webextension-polyfill";
+
 import niceUrl from "~/util/nice-url";
 import { createLazyResource, matchCommand, setInput } from "~/util/signals";
 

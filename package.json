@@ -11,7 +11,7 @@
   "scripts": {
     "serve": "vite dev --open 'http://127.0.0.1:5173/src/pages/popup/index.html'",
     "serve:prod": "npm run start:prod & npx serve dist & npx --yes open-cli http://localhost:3000/src/pages/popup/ -- 'google chrome' & wait",
-    "start": "vite build --watch --minify false",
+    "start": "vite build --watch --mode development --minify false",
     "start:prod": "vite build --watch",
     "build": "vite build",
     "lint": "eslint . --fix -c .eslintrc --ext js,ts --ignore-pattern='!.*'",
@@ -46,7 +46,6 @@
     "eslint-plugin-jsx-a11y": "6.7.1",
     "eslint-plugin-prettier": "5.0.0",
     "eslint-plugin-solid": "^0.13.0",
-    "eslint-plugin-tailwindcss": "^3.13.0",
     "fs-extra": "11.1.1",
     "jest": "^29.6.2",
     "jest-environment-jsdom": "^29.6.2",
@@ -61,7 +60,6 @@
     "ts-node": "10.9.1",
     "typescript": "5.1.6",
     "vite": "4.4.9",
-    "vite-plugin-solid": "^2.7.0",
-    "vite-plugin-windicss": "^1.9.1"
+    "vite-plugin-solid": "^2.7.0"
   }
 }

@@ -10,6 +10,7 @@ import {
   createSignal,
 } from "solid-js";
 import { tinykeys } from "tinykeys";
+import browser from "webextension-polyfill";
 
 import Entry from "./Entry";
 import Shortcut from "./Shortcut";
@@ -21,7 +22,6 @@ import historySuggestions from "./commands/history";
 import switchTabSuggestions from "./commands/tabs";
 import themeSuggestions from "./commands/themes";
 import websitesSuggestions from "./commands/website-search";
-import browser from "./util/browser";
 import { sortByUsed, storeLastUsed } from "./util/last-used";
 import { createStoredSignal, inputSignal, parsedInput } from "./util/signals";
 
@@ -50,7 +50,9 @@ const allCommands = createMemo(() => {
   return commands;
 });
 
-const [scrollIndex, setScrollIndex] = createSignal(50);
+const commandsLimit = 75;
+
+const [scrollIndex, setScrollIndex] = createSignal(commandsLimit);
 
 const matches = createMemo(() => {
   return fuzzysort.go(parsedInput().query, allCommands(), {
@@ -111,7 +113,7 @@ const PinWarning = () => {
 const App = () => {
   createEffect(() => {
     inputValue();
-    setScrollIndex(50);
+    setScrollIndex(commandsLimit);
   });
   return (
     <>
