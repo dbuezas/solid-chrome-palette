@@ -3,7 +3,15 @@ import { createLazyResource, parsedInput } from "~/util/signals";
 
 import { Command } from "./general";
 
-const commands = createLazyResource([], async () => {
+const baseCommands = [
+  {
+    title: `Sound/Audio tab: [none]`,
+    command: () => {
+      window.close();
+    },
+  },
+];
+const commands = createLazyResource(baseCommands, async () => {
   const allTabs = await browser.tabs.query({ audible: true });
   const actions: Command[] = allTabs.map(({ title, url, id, windowId }) => ({
     title: `Sound/Audio tab: ${title}`,
@@ -14,14 +22,7 @@ const commands = createLazyResource([], async () => {
       window.close();
     },
   }));
-  if (actions.length === 0) {
-    actions.push({
-      title: `Sound/Audio tab: [none]`,
-      command: () => {
-        window.close();
-      },
-    });
-  }
+  if (actions.length === 0) return baseCommands;
   return actions;
 });
 

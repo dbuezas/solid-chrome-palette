@@ -23,13 +23,14 @@ import themeSuggestions from "./commands/themes";
 import websitesSuggestions from "./commands/website-search";
 import browser from "./util/browser";
 import { sortByUsed, storeLastUsed } from "./util/last-used";
-import { createLazyResource, inputSignal, parsedInput } from "./util/signals";
+import { createStoredSignal, inputSignal, parsedInput } from "./util/signals";
 
-const shortcut = createLazyResource("?", async () => {
-  const commands = await browser.commands.getAll();
+const [shortcut, setShortcut] = createStoredSignal("_execute_action", "?");
+
+browser.commands.getAll().then((commands) => {
   const mainCommand = commands.find(({ name }) => name === "_execute_action");
-  if (mainCommand?.shortcut) return mainCommand.shortcut;
-  return "?";
+  if (mainCommand?.shortcut) setShortcut(mainCommand.shortcut);
+  else setShortcut("?");
 });
 
 const [inputValue, setInputValue] = inputSignal;
@@ -156,7 +157,7 @@ const App = () => {
           </InfiniteScroll>
         </ul>
       </div>
-      {/* <PinWarning /> */}
+      <PinWarning />
     </>
   );
 };
