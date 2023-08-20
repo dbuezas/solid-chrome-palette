@@ -9,7 +9,7 @@ import {
   createResource,
   createSignal,
 } from "solid-js";
-import tinykeys from "tinykeys";
+import { tinykeys } from "tinykeys";
 
 import Entry from "./Entry";
 import Shortcut from "./Shortcut";
