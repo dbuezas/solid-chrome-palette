@@ -476,7 +476,7 @@ const base: Command[] = [
   },
 ];
 
-export default function useCommandSuggestions(): Command[] {
+export default function generalSuggestions(): Command[] {
   const { isCommand } = parsedInput();
   if (isCommand) return [];
   return base;

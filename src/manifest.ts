@@ -45,7 +45,12 @@ const manifest = defineManifest(async () => ({
     "history",
     "favicon",
   ],
-
+  content_scripts: [
+    {
+      matches: ["https://chat.openai.com/*"],
+      js: ["src/pages/content/chatgpt.ts"],
+    },
+  ],
   web_accessible_resources: [
     {
       resources: [

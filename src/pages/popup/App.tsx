@@ -16,7 +16,8 @@ import Shortcut from "./Shortcut";
 import audibleTabSuggestions from "./commands/audio";
 import bookmarkThisSuggestions from "./commands/bookmark-this";
 import bookmarkSuggestions from "./commands/bookmarks";
-import commandSuggestions, { Command } from "./commands/general";
+import chatGptSuggestions from "./commands/chatgpt";
+import generalSuggestions, { Command } from "./commands/general";
 import historySuggestions from "./commands/history";
 import switchTabSuggestions from "./commands/tabs";
 import themeSuggestions from "./commands/themes";
@@ -36,12 +37,13 @@ const [inputValue, setInputValue] = inputSignal;
 
 const allCommands = createMemo(() => {
   let commands: Command[] = [
-    ...commandSuggestions(),
+    ...generalSuggestions(),
     ...audibleTabSuggestions(),
     ...switchTabSuggestions(),
     ...historySuggestions(),
     ...bookmarkSuggestions(),
     ...bookmarkThisSuggestions(),
+    ...chatGptSuggestions(),
     ...websitesSuggestions(),
     ...themeSuggestions(),
   ];
