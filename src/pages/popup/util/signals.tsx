@@ -29,7 +29,6 @@ export const createLazyResource = <T,>(
   const [val, setVal] = createSignal(initialValue);
   let fetched = false;
   return () => {
-    console.log({ initialValue, fetched, val: val() });
     if (!fetched) {
       fetched = true;
       new Promise((r) => requestAnimationFrame(r)).then(() =>

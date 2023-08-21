@@ -8,26 +8,23 @@ export default function Shortcut(props: {
 }) {
   return (
     <Show when={props.keys}>
-      {(keys) => {
-        console.log({ keys: keys() });
-        return (
-          <span
-            class="Shortcut"
-            classList={{
-              clickable: !!props.onClick,
-            }}
-            title={props.onClick && "Click to set extension shortcut"}
-            onClick={props.onClick}
-          >
-            {keys()
-              .replaceAll(" ", "")
-              .split("")
-              .map((c) => (
-                <kbd>{c}</kbd>
-              ))}
-          </span>
-        );
-      }}
+      {(keys) => (
+        <span
+          class="Shortcut"
+          classList={{
+            clickable: !!props.onClick,
+          }}
+          title={props.onClick && "Click to set extension shortcut"}
+          onClick={props.onClick}
+        >
+          {keys()
+            .replaceAll(" ", "")
+            .split("")
+            .map((c) => (
+              <kbd>{c}</kbd>
+            ))}
+        </span>
+      )}
     </Show>
   );
 }

@@ -1,10 +1,14 @@
-const preloadHTML = async () => {
-  if (!(await chrome.offscreen.hasDocument())) {
-    await chrome.offscreen.createDocument({
-      url: "src/pages/background/index.html",
-      reasons: [chrome.offscreen.Reason.DISPLAY_MEDIA],
-      justification: "Helps with faster load times of popup",
-    });
+chrome.runtime.onInstalled.addListener(async ({ reason }) => {
+  if (reason !== "install") {
+    return;
   }
-};
-preloadHTML();
+
+  chrome.alarms.onAlarm.addListener((alarm) => {
+    console.log({ alarm }, new Date());
+  });
+  // Create an alarm so we have something to look at in the demo
+  await chrome.alarms.create("watchdog", {
+    delayInMinutes: 0,
+    periodInMinutes: 1,
+  });
+});

@@ -37,7 +37,7 @@ const manifest = defineManifest(async () => ({
     },
   },
   permissions: [
-    "offscreen",
+    "alarms",
     "tabs",
     "sessions",
     "bookmarks",
