@@ -313,7 +313,7 @@ const base: Command[] = [
     },
   },
   {
-    title: "Clear browsing data",
+    title: "Clear browsing history, cookies and cache",
     shortcut: "⌘⇧ ⌫",
     command: async function () {
       await chrome.tabs.create({ url: "chrome://settings/clearBrowserData" });
@@ -465,6 +465,7 @@ const base: Command[] = [
   // },
   {
     title: "Reset command history",
+    subtitle: "Resets the order of commands in this extension",
     command: async function () {
       setTimeout(() => {
         // otherwise this command will be stored
