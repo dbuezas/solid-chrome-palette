@@ -6,7 +6,7 @@ import { Command } from "./general";
 
 const KEYWORD = "theme";
 
-const THEMES = ["Default", "Dark", "Light", "Github"] as const;
+const THEMES = ["Set by OS", "Dark", "Light"] as const;
 type Theme = (typeof THEMES)[number];
 
 const getOsTheme = (): Theme =>
@@ -21,11 +21,11 @@ window
 
 const [themeConfig, setThemeConfig] = createStoredSignal<Theme>(
   "theme",
-  "Default"
+  "Set by OS"
 );
 
 export const theme = createMemo(() => {
-  if (themeConfig() === "Default") return osTheme();
+  if (themeConfig() === "Set by OS") return osTheme();
   return themeConfig();
 });
 

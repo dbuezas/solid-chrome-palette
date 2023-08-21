@@ -9,23 +9,24 @@ const traverse = (
   nodes: chrome.bookmarks.BookmarkTreeNode[],
   breadcrumb = ""
 ): Command[] => {
-  return nodes.flatMap(({ children, url, title, dateAdded }) => {
-    const path = breadcrumb ? breadcrumb + "/" + title : title;
-    if (children) {
-      return traverse(children, path);
-    }
-    url ||= "";
-    return {
-      title: `${title} > ${breadcrumb}`,
-      subtitle: niceUrl(url),
-      icon: "chrome://favicon/" + url,
-      lastVisitTime: dateAdded,
-      command: async function () {
-        await chrome.tabs.create({ url });
-      },
-    };
-  });
-  // .sort((a, b) => b.dateAdded - a.dateAdded);
+  return nodes
+    .sort((a, b) => (b.dateAdded || 0) - (a.dateAdded || 0))
+    .flatMap(({ children, url, title, dateAdded }) => {
+      const path = breadcrumb ? breadcrumb + "/" + title : title;
+      if (children) {
+        return traverse(children, path);
+      }
+      url ||= "";
+      return {
+        title: `${title} > ${breadcrumb}`,
+        subtitle: niceUrl(url),
+        icon: "chrome://favicon/" + url,
+        lastVisitTime: dateAdded,
+        command: async function () {
+          await chrome.tabs.create({ url });
+        },
+      };
+    });
 };
 const commands = createLazyResource([], async () => {
   ("fetching bookmarks");

@@ -410,7 +410,7 @@ const base: Command[] = [
     },
   },
   {
-    title: "Configure Default chrome",
+    title: "Configure Default browser",
     command: async function () {
       await chrome.tabs.create({ url: "chrome://settings/defaultBrowser" });
     },
@@ -475,15 +475,6 @@ const base: Command[] = [
     },
   },
 ];
-
-if (process.env.NODE_ENV !== "production") {
-  base.push({
-    title: "Throw error",
-    command: async function () {
-      throw new Error("on purpose");
-    },
-  });
-}
 
 export default function useCommandSuggestions(): Command[] {
   const { isCommand } = parsedInput();

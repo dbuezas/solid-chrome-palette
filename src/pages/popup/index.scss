@@ -38,17 +38,6 @@ body[theme="Dark"] {
   background-color: var(--thumbBG);
 }
 
-body[theme="Github"] {
-  --app-background-color: #25292e;
-  --entry-hover-background-color: #eee;
-  --entry-hover-border-color: #666;
-  --entry-matched-text: #9de5a4;
-  --shortcut-background-color: #81b0f0;
-  --shortcut-border-color: #2a3748;
-  --shortcut-text-color: #000;
-  --text-color: #e2e4e8;
-}
-
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

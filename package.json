@@ -16,7 +16,8 @@
     "build": "vite build",
     "lint": "eslint . --fix -c .eslintrc --ext js,ts --ignore-pattern='!.*'",
     "dev:nodemon": "nodemon",
-    "build:noemit": "tsc --noEmit && vite build",
+    "analyse-bundle": "npx vite-bundle-visualizer",
+    "upgrade-deps": "npx npm-upgrade",
     "test": "jest"
   },
   "type": "module",
