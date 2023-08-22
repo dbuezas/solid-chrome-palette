@@ -8,24 +8,29 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
     periodInMinutes: 1,
   });
 });
+type Message = {
+  action: string;
+  query?: string;
+};
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.action === "createTabAndSendMessage") {
     const query = request.query;
     const tab = await chrome.tabs.create({ url: "https://chat.openai.com/" });
     const listener = (
-      message: any,
+      message: Message,
       sender: chrome.runtime.MessageSender,
-      sendResponse: (response?: any) => void
+      sendResponse: (response?: Message) => void
     ) => {
-      if (sender.tab?.id === tab.id && message.action === "chatgpt-client") {
-        chrome.runtime.onMessage.removeListener(listener);
-        sendResponse({
-          action: "query",
-          query,
-        });
-      }
+      if (sender.tab?.id !== tab.id || message.action !== "chatgpt-client")
+        return;
+      chrome.runtime.onMessage.removeListener(listener);
+      sendResponse({
+        action: "query",
+        query,
+      });
     };
     chrome.runtime.onMessage.addListener(listener);
+    setTimeout(() => chrome.runtime.onMessage.removeListener(listener), 5000);
   }
 });
