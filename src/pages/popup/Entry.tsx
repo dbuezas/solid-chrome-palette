@@ -8,6 +8,7 @@ import twas from "twas";
 import Keyword from "./Keyword";
 import Shortcut from "./Shortcut";
 import { Command } from "./commands/general";
+import { storeLastUsed } from "./util/last-used";
 import { parsedInput } from "./util/signals";
 
 function faviconURL(u: string) {
@@ -36,7 +37,10 @@ export default function Entry(props: {
       classList={{
         selected: props.isSelected,
       }}
-      onclick={() => props.command.command()}
+      onclick={() => {
+        storeLastUsed(props.command);
+        props.command.command();
+      }}
       ref={(el) => {
         createEffect(() => {
           if (props.isSelected) {

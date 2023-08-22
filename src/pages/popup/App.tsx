@@ -98,8 +98,8 @@ tinykeys(window, {
   Enter: (e) => {
     e.preventDefault();
     const selected = filteredCommands()[selectedI()];
-    selected.command();
     storeLastUsed(selected);
+    selected.command();
   },
 });
 
