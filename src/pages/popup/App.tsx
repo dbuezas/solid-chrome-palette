@@ -66,6 +66,11 @@ const matches = createMemo(() => {
   });
 });
 const filteredCommands = createMemo(() => {
+  /* Filtered commands are contained by matches are stable references.
+   * This means they don't change while you type, and this allows the
+   * <Each /> component (or <InfiniteScroll />) to use them as keys,
+   * and not re-create dom elements.
+   */
   return matches().map((match) => match.obj);
 });
 
