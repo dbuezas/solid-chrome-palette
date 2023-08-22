@@ -5,9 +5,7 @@ import { Command } from "./general";
 const baseCommands = [
   {
     title: `Sound/Audio tab: [none]`,
-    command: () => {
-      window.close();
-    },
+    command: () => {},
   },
 ];
 const commands = createLazyResource(baseCommands, async () => {
