@@ -54,6 +54,7 @@ export default function Entry(props: {
             }}
             src={faviconURL(icon())}
             alt=""
+            loading="lazy"
           />
         )}
       </Show>
