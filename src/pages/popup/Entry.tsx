@@ -71,7 +71,7 @@ export default function Entry(props: {
               props.command.subtitle}
           </Show>
           <Show when={props.command.lastVisitTime}>
-            {(time) => <span class="time_ago">{twas(time())} ago</span>}
+            {(time) => <span class="time_ago">{twas(time())}</span>}
           </Show>
         </div>
       </div>

@@ -1,13 +1,17 @@
-chrome.runtime.onInstalled.addListener(async ({ reason }) => {
-  if (reason !== "install") return;
-  chrome.alarms.onAlarm.addListener((alarm) => {
-    console.log({ alarm }, new Date());
-  });
-  await chrome.alarms.create("watchdog", {
-    delayInMinutes: 0,
-    periodInMinutes: 1,
-  });
+chrome.alarms.onAlarm.addListener((alarm) => {
+  console.log({ alarm }, new Date());
 });
+
+chrome.alarms.create("watchdog", {
+  delayInMinutes: 0,
+  periodInMinutes: 1,
+});
+
+chrome.alarms.create("watchdog2", {
+  delayInMinutes: 0.5,
+  periodInMinutes: 1,
+});
+
 type Message = {
   action: string;
   query?: string;
