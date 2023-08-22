@@ -13,7 +13,7 @@ const waitFor = async <T>(fn: () => T) => {
 
 const waitForIdle = async () => {
   const start = document.documentElement.innerText;
-  await sleep(300);
+  await sleep(1000);
   if (start !== document.documentElement.innerText) await waitForIdle();
 };
 
