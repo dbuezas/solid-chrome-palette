@@ -36,10 +36,11 @@ const commands = createLazyResource([], async () => {
 
 const base: Command[] = [
   {
-    title: "Bookmarked Tabs",
+    title: "Search Bookmarks",
     command: async function () {
       setInput(KEYWORD + ">");
     },
+    icon: "chrome://bookmarks/",
     keyword: KEYWORD + ">",
   },
 ];

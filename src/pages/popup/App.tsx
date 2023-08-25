@@ -39,10 +39,10 @@ const allCommands = createMemo(() => {
   let commands: Command[] = [
     ...generalSuggestions(),
     ...audibleTabSuggestions(),
+    ...bookmarkThisSuggestions(),
     ...switchTabSuggestions(),
     ...historySuggestions(),
     ...bookmarkSuggestions(),
-    ...bookmarkThisSuggestions(),
     ...chatGptSuggestions(),
     ...websitesSuggestions(),
     ...themeSuggestions(),

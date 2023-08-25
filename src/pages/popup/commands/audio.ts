@@ -12,7 +12,7 @@ const commands = createLazyResource(baseCommands, async () => {
   const allTabs = await chrome.tabs.query({ audible: true });
   const actions: Command[] = allTabs.map(({ title, url, id, windowId }) => ({
     title: `Sound/Audio tab: ${title}`,
-    icon: "chrome://favicon/" + url,
+    icon: url,
     command: () => {
       chrome.tabs.update(id!, { highlighted: true });
       chrome.windows.update(windowId!, { focused: true });
