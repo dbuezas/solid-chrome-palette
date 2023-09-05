@@ -5,10 +5,10 @@ import fuzzysort from "fuzzysort";
 import { Show, createEffect, createMemo } from "solid-js";
 import twas from "twas";
 
+import { runCommand } from "./App";
 import Keyword from "./Keyword";
 import Shortcut from "./Shortcut";
 import { Command } from "./commands/general";
-import { storeLastUsed } from "./util/last-used";
 import { parsedInput } from "./util/signals";
 
 function faviconURL(u: string) {
@@ -23,13 +23,21 @@ export default function Entry(props: {
   command: Command;
   keyResults: Fuzzysort.KeysResult<Command>;
 }) {
+  const title = createMemo(() => {
+    const txt = props.command.title || "";
+    if (!parsedInput().query) return txt;
+    return fuzzysort.highlight(props.keyResults[0], (t) => <b>{t}</b>) || txt;
+  });
   const subtitle = createMemo(() => {
-    if (!parsedInput().query) return props.command.subtitle || "";
-    return (
-      fuzzysort.highlight(props.keyResults[1], (t) => <b>{t}</b>) ||
-      props.command.subtitle ||
-      ""
-    );
+    const txt = props.command.subtitle || "";
+    if (!parsedInput().query) return txt;
+    return fuzzysort.highlight(props.keyResults[1], (t) => <b>{t}</b>) || txt;
+  });
+  const url = createMemo(() => {
+    if (!("url" in props.command)) return "";
+    const txt = props.command.url;
+    if (!parsedInput().query) return txt;
+    return fuzzysort.highlight(props.keyResults[2], (t) => <b>{t}</b>) || txt;
   });
   return (
     <li
@@ -38,8 +46,7 @@ export default function Entry(props: {
         selected: props.isSelected,
       }}
       onclick={() => {
-        storeLastUsed(props.command);
-        props.command.command();
+        runCommand(props.command);
       }}
       ref={(el) => {
         createEffect(() => {
@@ -54,7 +61,7 @@ export default function Entry(props: {
           <img
             classList={{
               img: true,
-              img_big: !!subtitle(),
+              img_big: !!(subtitle() || url()),
             }}
             src={faviconURL(icon())}
             alt=""
@@ -66,14 +73,15 @@ export default function Entry(props: {
       <div class="text">
         <div class="title">
           <Show when={parsedInput().query} fallback={props.command.title}>
-            {fuzzysort.highlight(props.keyResults[0], (t) => <b>{t}</b>) ||
-              props.command.title}
+            {title()}
           </Show>
         </div>
         <div class="subtitle">
           <Show when={parsedInput().query} fallback={props.command.subtitle}>
-            {fuzzysort.highlight(props.keyResults[1], (t) => <b>{t}</b>) ||
-              props.command.subtitle}
+            {subtitle()}
+          </Show>
+          <Show when={parsedInput().query} fallback={props.command.url}>
+            {url()}
           </Show>
           <Show when={props.command.lastVisitTime}>
             {(time) => <span class="time_ago">{twas(time())}</span>}

@@ -51,11 +51,7 @@ export default function websitesSuggestions(): Command[] {
       return [
         {
           title: `Search ${template.title}: ${query}`,
-          command: async function () {
-            await chrome.tabs.create({
-              url: template.url(query),
-            });
-          },
+          url: template.url(query),
         },
       ];
   }

@@ -7,10 +7,11 @@ export function resetHistory() {
   localStorage.lastUsed = JSON.stringify(store);
 }
 export function storeLastUsed(command: Command) {
-  store.unshift(command.title);
-  store = [...new Set(store)];
-  store = store.slice(0, 50);
-  localStorage.lastUsed = JSON.stringify(store);
+  let nextTimeStore = store.slice();
+  nextTimeStore.unshift(command.title);
+  nextTimeStore = [...new Set(nextTimeStore)];
+  nextTimeStore = nextTimeStore.slice(0, 50);
+  localStorage.lastUsed = JSON.stringify(nextTimeStore);
 }
 export function sortByUsed(commands: Command[]) {
   commands.sort((a, b) => {

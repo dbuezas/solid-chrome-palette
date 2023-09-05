@@ -1,4 +1,3 @@
-import niceUrl from "~/util/nice-url";
 import { createLazyResource, matchCommand, setInput } from "~/util/signals";
 
 import { Command } from "./general";
@@ -19,12 +18,9 @@ const traverse = (
       url ||= "";
       return {
         title: `${title} > ${breadcrumb}`,
-        subtitle: niceUrl(url),
         icon: "chrome://favicon/" + url,
         lastVisitTime: dateAdded,
-        command: async function () {
-          await chrome.tabs.create({ url });
-        },
+        url,
       };
     });
 };

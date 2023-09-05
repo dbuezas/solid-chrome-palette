@@ -60,13 +60,14 @@ const matches = createMemo(() => {
     threshold: -10000, // don't return bad results
     limit: scrollIndex(), // Don't return more results than this (lower is faster)
     all: true, // If true, returns all results for an empty search
-    keys: ["title", "subtitle"], // For when targets are objects (see its example usage)
+    keys: ["title", "subtitle", "url"], // For when targets are objects (see its example usage)
     // keys: null, // For when targets are objects (see its example usage)
     // scoreFn: null, // For use with `keys` (see its example usage)
   });
 });
+
 const filteredCommands = createMemo(() => {
-  /* Filtered commands are contained by matches are stable references.
+  /* The filtered commands are contained in matches and are stable references.
    * This means they don't change while you type, and this allows the
    * <Each /> component (or <InfiniteScroll />) to use them as keys,
    * and not re-create dom elements.
@@ -86,6 +87,12 @@ createEffect(() => {
   setSelectedI(0);
 });
 
+export const runCommand = async (command: Command) => {
+  storeLastUsed(command);
+  if ("url" in command) chrome.tabs.create({ url: command.url });
+  command.command?.();
+};
+
 tinykeys(window, {
   ArrowUp: (e) => {
     e.preventDefault();
@@ -98,8 +105,7 @@ tinykeys(window, {
   Enter: (e) => {
     e.preventDefault();
     const selected = filteredCommands()[selectedI()];
-    storeLastUsed(selected);
-    selected.command();
+    runCommand(selected);
   },
 });
 
@@ -123,16 +129,18 @@ const App = () => {
   });
   return (
     <>
-      <div class="App">
+      <div
+        class="App"
+        onBlur={(e) => {
+          window.close();
+        }}
+      >
         <div class="input_wrap">
           <input
             class="input"
             autofocus
             placeholder="Type to search..."
             value={inputValue()}
-            onBlur={(e) => {
-              e.target.focus();
-            }}
             onInput={(e) => {
               setInputValue(e.target.value);
               setSelectedI(0);

@@ -10,9 +10,11 @@ export type Command = {
   shortcut?: string;
   lastVisitTime?: number;
   keyword?: string;
-  command: Function;
   icon?: string;
+  command?: Function;
+  url?: string;
 };
+
 const [, setInputValue] = inputSignal;
 
 const getActiveTab = async () => {
@@ -41,41 +43,29 @@ const base: Command[] = [
   {
     title: "Open History Page",
     shortcut: "⌘ y",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://history" });
-    },
+    url: "chrome://history",
   },
   {
     title: "Open Passwords Page",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/passwords" });
-    },
+    url: "chrome://settings/passwords",
   },
   {
     title: "Open Downloads",
     shortcut: "⌘⇧ d",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://downloads" });
-    },
+    url: "chrome://downloads",
   },
   {
     title: "Open Extensions",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://extensions" });
-    },
+    url: "chrome://extensions",
   },
   {
     title: "Open Extension Shortcuts",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
-    },
+    url: "chrome://extensions/shortcuts",
   },
   {
     title: "Open Bookmark Manager",
     shortcut: "⌘⌥ b",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://bookmarks" });
-    },
+    url: "chrome://bookmarks",
   },
   {
     title: "Show/hide Bookmarks Bar",
@@ -87,9 +77,7 @@ const base: Command[] = [
   {
     title: "Open Settings",
     shortcut: "⌘ ,",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings" });
-    },
+    url: "chrome://settings",
   },
   {
     title: "Close Current Tab",
@@ -315,145 +303,95 @@ const base: Command[] = [
   {
     title: "Clear browsing history, cookies and cache",
     shortcut: "⌘⇧ ⌫",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/clearBrowserData" });
-    },
+    url: "chrome://settings/clearBrowserData",
   },
   {
     title: "Open Chrome SignIn internals",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://signin-internals/" });
-    },
+    url: "chrome://signin-internals/",
   },
   {
     title: "Open Chrome Apps",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://apps/" });
-    },
+    url: "chrome://apps/",
   },
   {
     title: "Configure Chrome internal flags",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://flags/" });
-    },
+    url: "chrome://flags/",
   },
   {
     title: "Configure Third-party Cookies",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/cookies" });
-    },
+    url: "chrome://settings/cookies",
   },
   {
     title: "Configure Ad privacy",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/adPrivacy" });
-    },
+    url: "chrome://settings/adPrivacy",
   },
   {
     title: "Configure Sync and Google Services",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/syncSetup" });
-    },
+    url: "chrome://settings/syncSetup",
   },
   {
     title: "Configure Chrome Profile",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/manageProfile" });
-    },
+    url: "chrome://settings/manageProfile",
   },
   {
     title: "Import Bookmarks & Settings",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/importData" });
-    },
+    url: "chrome://settings/importData",
   },
   {
     title: "Configure Addresses",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/addresses" });
-    },
+    url: "chrome://settings/addresses",
   },
   {
     title: "Configure Autofill & Passwords",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/autofill" });
-    },
+    url: "chrome://settings/autofill",
   },
   {
     title: "Configure Payment Methods",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/payments" });
-    },
+    url: "chrome://settings/payments",
   },
   {
     title: "Configure Site Settings & Permissions",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/content" });
-    },
+    url: "chrome://settings/content",
   },
   {
     title: "Configure Security",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/security" });
-    },
+    url: "chrome://settings/security",
   },
   {
     title: "Configure Privacy and security",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/privacy" });
-    },
+    url: "chrome://settings/privacy",
   },
   {
     title: "Configure Search engine",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/defaultBrowser" });
-    },
+    url: "chrome://settings/defaultBrowser",
   },
   {
     title: "Configure Default browser",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/defaultBrowser" });
-    },
+    url: "chrome://settings/defaultBrowser",
   },
   {
     title: "Configure on Start-up",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/onStartup" });
-    },
+    url: "chrome://settings/onStartup",
   },
   {
     title: "Configure Languages",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/languages" });
-    },
+    url: "chrome://settings/languages",
   },
   {
     title: "Configure Accessibility",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/accessibility" });
-    },
+    url: "chrome://settings/accessibility",
   },
   {
     title: "Configure System & Proxy",
-    command: async function () {
-      await chrome.tabs.create({ url: "chrome://settings/system" });
-    },
+    url: "chrome://settings/system",
   },
   {
     title: "Reset chrome settings",
-    command: async function () {
-      await chrome.tabs.create({
-        url: "chrome://settings/resetProfileSettings?origin=userclick",
-      });
-    },
+    url: "chrome://settings/resetProfileSettings?origin=userclick",
   },
   {
     title: "About chrome",
-    command: async function () {
-      await chrome.tabs.create({
-        url: "chrome://settings/help",
-      });
-    },
+    url: "chrome://settings/help",
   },
   // {
   //   title: "Print page",

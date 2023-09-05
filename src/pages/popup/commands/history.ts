@@ -1,4 +1,3 @@
-import niceUrl from "~/util/nice-url";
 import { createLazyResource, matchCommand, setInput } from "~/util/signals";
 
 import { Command } from "./general";
@@ -32,13 +31,9 @@ const commands = createLazyResource<Command[]>([], async (setVal) => {
           if (!url) return null;
           return {
             title: title || "Untitled",
-            subtitle: niceUrl(url),
-            // keyword: url.slice(0, 100),
             lastVisitTime,
             icon: url,
-            command: async function () {
-              await chrome.tabs.create({ url });
-            },
+            url,
           };
         })
         .filter(isDefined);
